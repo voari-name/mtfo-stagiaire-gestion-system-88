@@ -1,15 +1,33 @@
 
 import { useState } from "react";
 
-// Sample interns data
-const interns = [
-  { id: 1, name: "Jean Rakoto", status: "en cours", completion: 65 },
-  { id: 2, name: "Marie Razafy", status: "en cours", completion: 45 },
-  { id: 3, name: "Hery Randriamaro", status: "fin", completion: 100 }
-];
+// Types
+export type TaskStatus = "completed" | "in-progress" | "not-started";
 
-// Sample projects data
-const initialProjects = [
+export interface Task {
+  id: number;
+  name: string;
+  status: TaskStatus;
+}
+
+export interface Intern {
+  id: number;
+  name: string;
+  status: string;
+  completion: number;
+}
+
+export interface Project {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  interns: Intern[];
+  tasks: Task[];
+}
+
+// Sample projects data with proper task status typing
+const initialProjects: Project[] = [
   {
     id: 1,
     title: "Développement Web",
@@ -53,31 +71,6 @@ const initialProjects = [
     ]
   }
 ];
-
-// Types
-export type TaskStatus = "completed" | "in-progress" | "not-started";
-
-export interface Task {
-  id: number;
-  name: string;
-  status: TaskStatus;
-}
-
-export interface Intern {
-  id: number;
-  name: string;
-  status: string;
-  completion: number;
-}
-
-export interface Project {
-  id: number;
-  title: string;
-  startDate: string;
-  endDate: string;
-  interns: Intern[];
-  tasks: Task[];
-}
 
 export const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>(initialProjects);
