@@ -9,9 +9,15 @@ type MainLayoutProps = {
   children: ReactNode;
   title: string;
   currentPage?: string;
+  username?: string;
 };
 
-const MainLayout = ({ children, title, currentPage = "dashboard" }: MainLayoutProps) => {
+const MainLayout = ({ 
+  children, 
+  title, 
+  currentPage = "dashboard",
+  username = ""
+}: MainLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -36,7 +42,7 @@ const MainLayout = ({ children, title, currentPage = "dashboard" }: MainLayoutPr
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header title={title} />
+        <Header title={title} username={username} />
         <main className="flex-1 overflow-y-auto p-6 bg-gray-100">
           {children}
         </main>

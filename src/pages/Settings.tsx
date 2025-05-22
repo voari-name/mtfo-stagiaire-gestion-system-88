@@ -9,12 +9,23 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
 const Settings = () => {
-  const [brightness, setBrightness] = useState([80]);
+  // Form states
+  const [brightness, setBrightness] = useState([50]);
   const [standbyTimeout, setStandbyTimeout] = useState([5]);
   const [darkMode, setDarkMode] = useState(false);
-  const [language, setLanguage] = useState("fr");
+  const [standbyMode, setStandbyMode] = useState(false);
+  const [language, setLanguage] = useState("");
+  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [twoFactorAuth, setTwoFactorAuth] = useState(false);
+  const [newStagiaires, setNewStagiaires] = useState(false);
+  const [pendingEvaluations, setPendingEvaluations] = useState(false);
+  const [projectDeadlines, setProjectDeadlines] = useState(false);
+  
   const { toast } = useToast();
 
   const handleSaveSettings = () => {
@@ -22,6 +33,23 @@ const Settings = () => {
       title: "Paramètres mis à jour",
       description: "Vos préférences ont été enregistrées avec succès."
     });
+  };
+
+  const handleExportData = () => {
+    toast({
+      title: "Exportation des données",
+      description: "Vos données sont en cours d'exportation. Vous recevrez un email lorsque l'exportation sera terminée."
+    });
+  };
+
+  const handleDeleteAccount = () => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")) {
+      toast({
+        title: "Compte supprimé",
+        description: "Votre compte a été supprimé avec succès.",
+        variant: "destructive"
+      });
+    }
   };
 
   const languages = [
@@ -59,7 +87,11 @@ const Settings = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <Label htmlFor="standby">Mode veille</Label>
-                      <Switch id="standby" />
+                      <Switch 
+                        id="standby" 
+                        checked={standbyMode}
+                        onCheckedChange={setStandbyMode}
+                      />
                     </div>
                   </div>
                   
@@ -138,7 +170,11 @@ const Settings = () => {
                   <div>
                     <Label htmlFor="email-notifications" className="mb-2 block">Notifications par email</Label>
                     <div className="flex items-center space-x-2">
-                      <Switch id="email-notifications" />
+                      <Switch 
+                        id="email-notifications" 
+                        checked={emailNotifications}
+                        onCheckedChange={setEmailNotifications}
+                      />
                       <Label htmlFor="email-notifications" className="text-sm">Recevoir des notifications par email</Label>
                     </div>
                   </div>
@@ -146,7 +182,11 @@ const Settings = () => {
                   <div>
                     <Label htmlFor="two-factor" className="mb-2 block">Authentification à deux facteurs</Label>
                     <div className="flex items-center space-x-2">
-                      <Switch id="two-factor" />
+                      <Switch 
+                        id="two-factor" 
+                        checked={twoFactorAuth}
+                        onCheckedChange={setTwoFactorAuth}
+                      />
                       <Label htmlFor="two-factor" className="text-sm">Activer l'authentification à deux facteurs</Label>
                     </div>
                   </div>
@@ -161,8 +201,14 @@ const Settings = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-col space-y-2">
-                  <Button variant="outline">Exporter mes données</Button>
-                  <Button variant="outline" className="text-red-600 border-red-600 hover:bg-red-50">Supprimer mon compte</Button>
+                  <Button variant="outline" onClick={handleExportData}>Exporter mes données</Button>
+                  <Button 
+                    variant="outline" 
+                    className="text-red-600 border-red-600 hover:bg-red-50"
+                    onClick={handleDeleteAccount}
+                  >
+                    Supprimer mon compte
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -181,7 +227,10 @@ const Settings = () => {
                       <p className="font-medium">Nouveaux stagiaires</p>
                       <p className="text-sm text-muted-foreground">Recevoir une notification lorsqu'un nouveau stagiaire est ajouté</p>
                     </div>
-                    <Switch />
+                    <Switch 
+                      checked={newStagiaires}
+                      onCheckedChange={setNewStagiaires}
+                    />
                   </div>
                   
                   <div className="flex items-center justify-between">
@@ -189,7 +238,10 @@ const Settings = () => {
                       <p className="font-medium">Évaluations en attente</p>
                       <p className="text-sm text-muted-foreground">Recevoir une notification pour les évaluations qui doivent être complétées</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={pendingEvaluations}
+                      onCheckedChange={setPendingEvaluations}
+                    />
                   </div>
                   
                   <div className="flex items-center justify-between">
@@ -197,7 +249,10 @@ const Settings = () => {
                       <p className="font-medium">Échéances des projets</p>
                       <p className="text-sm text-muted-foreground">Recevoir un rappel pour les projets dont l'échéance approche</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={projectDeadlines}
+                      onCheckedChange={setProjectDeadlines}
+                    />
                   </div>
                 </div>
               </CardContent>
