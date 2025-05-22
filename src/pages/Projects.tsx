@@ -8,8 +8,12 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Import the same intern data structure for consistency
-import { initialInterns } from "./Internships";
+// Sample interns data (instead of importing from Internships)
+const interns = [
+  { id: 1, name: "Jean Rakoto", status: "en cours", completion: 65 },
+  { id: 2, name: "Marie Razafy", status: "en cours", completion: 45 },
+  { id: 3, name: "Hery Randriamaro", status: "fin", completion: 100 }
+];
 
 // Sample projects data
 const initialProjects = [

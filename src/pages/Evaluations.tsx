@@ -53,8 +53,8 @@ const Evaluations = () => {
 
   const handleSaveEvaluation = () => {
     if (currentEvaluation) {
-      setEvaluations(evaluations.map(eval => 
-        eval.id === currentEvaluation.id ? currentEvaluation : eval
+      setEvaluations(evaluations.map(item => 
+        item.id === currentEvaluation.id ? currentEvaluation : item
       ));
       
       setIsEditDialogOpen(false);
@@ -66,7 +66,7 @@ const Evaluations = () => {
   };
 
   const handleDeleteEvaluation = (id: number) => {
-    setEvaluations(evaluations.filter(eval => eval.id !== id));
+    setEvaluations(evaluations.filter(item => item.id !== id));
     toast({
       title: "Évaluation supprimée",
       description: "L'évaluation a été supprimée avec succès.",
