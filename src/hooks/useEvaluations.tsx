@@ -40,6 +40,10 @@ export const useEvaluations = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
 
+  const addEvaluation = (newEvaluation: EvaluationType) => {
+    setEvaluations([...evaluations, newEvaluation]);
+  };
+
   const handleEditEvaluation = (evaluation: EvaluationType) => {
     setCurrentEvaluation({ ...evaluation });
     setIsEditDialogOpen(true);
@@ -97,6 +101,7 @@ export const useEvaluations = () => {
     handleSaveEvaluation,
     handleDeleteEvaluation,
     handleGeneratePdf,
-    handleInputChange
+    handleInputChange,
+    addEvaluation
   };
 };

@@ -4,6 +4,7 @@ import MainLayout from "@/components/MainLayout";
 import { Input } from "@/components/ui/input";
 import EvaluationCard from "@/components/evaluations/EvaluationCard";
 import EditEvaluationDialog from "@/components/evaluations/EditEvaluationDialog";
+import { CreateEvaluationDialog } from "@/components/evaluations/CreateEvaluationDialog";
 import { useEvaluations } from "@/hooks/useEvaluations";
 
 const Evaluations = () => {
@@ -16,30 +17,35 @@ const Evaluations = () => {
     handleSaveEvaluation,
     handleDeleteEvaluation,
     handleGeneratePdf,
-    handleInputChange
+    handleInputChange,
+    addEvaluation
   } = useEvaluations();
 
   return (
-    <MainLayout title="Évaluations des stagiaires" currentPage="evaluations">
-      <div className="space-y-6">
+    <MainLayout title="Évaluations des stagiaires" currentPage="evaluations" username="RAHAJANIAINA Olivier">
+      <div className="space-y-6 animate-fade-in">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Évaluations</h2>
-          <Input
-            type="text"
-            placeholder="Rechercher une évaluation..."
-            className="max-w-xs"
-          />
+          <div className="flex space-x-4">
+            <Input
+              type="text"
+              placeholder="Rechercher une évaluation..."
+              className="max-w-xs transition-all duration-300 focus:scale-105"
+            />
+            <CreateEvaluationDialog onEvaluationCreated={addEvaluation} />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
-          {evaluations.map(evaluation => (
-            <EvaluationCard
-              key={evaluation.id}
-              evaluation={evaluation}
-              onEdit={handleEditEvaluation}
-              onDelete={handleDeleteEvaluation}
-              onGeneratePdf={handleGeneratePdf}
-            />
+          {evaluations.map((evaluation, index) => (
+            <div key={evaluation.id} className="animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
+              <EvaluationCard
+                evaluation={evaluation}
+                onEdit={handleEditEvaluation}
+                onDelete={handleDeleteEvaluation}
+                onGeneratePdf={handleGeneratePdf}
+              />
+            </div>
           ))}
         </div>
       </div>

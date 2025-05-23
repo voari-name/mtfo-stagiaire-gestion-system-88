@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const Index = () => {
-  const [showLogin, setShowLogin] = useState(false);
+  const [showMTEFoPInfo, setShowMTEFoPInfo] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = () => {
@@ -14,20 +16,20 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with MTFoP Banner */}
-      <div className="w-full bg-gradient-to-r from-red-600 via-white to-green-600 p-4 shadow-md">
+      <div className="w-full bg-gradient-to-r from-red-600 via-white to-green-600 p-4 shadow-md animate-fade-in">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center space-x-2 text-gold">
+          <div className="flex items-center space-x-2 text-gold animate-slide-in-right">
             <p className="text-sm text-gold font-semibold">REPOBLIKAN'I MADAGASIKARA</p>
             <p className="text-sm text-gold font-light">Fitiavana - Tanindrazana - Fandrosoana</p>
           </div>
-          <div className="flex justify-center my-4 md:my-0">
+          <div className="flex justify-center my-4 md:my-0 animate-scale-in">
             <img 
               src="/lovable-uploads/bbbcd3ef-0021-42ca-8d32-8796bd1cf670.png" 
               alt="MTFoP Logo" 
-              className="h-24 w-auto"
+              className="h-24 w-auto hover-scale transition-transform duration-300"
             />
           </div>
-          <div className="text-right">
+          <div className="text-right animate-slide-in-right">
             <p className="text-md font-semibold text-green-800">Ministère du Travail, de l'Emploi</p>
             <p className="text-md font-semibold text-green-800">et de la Fonction Publique</p>
           </div>
@@ -37,42 +39,118 @@ const Index = () => {
       {/* Main Content */}
       <div className="container mx-auto py-8 px-4">
         <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="w-full md:w-1/2">
-            <h1 className="text-4xl font-bold text-blue-900 mb-6">Système de Gestion des Stagiaires</h1>
-            <p className="text-lg text-gray-700 mb-4">
+          <div className="w-full md:w-1/2 animate-fade-in">
+            <h1 className="text-4xl font-bold text-blue-900 mb-6 animate-slide-in-right">Système de Gestion des Stagiaires</h1>
+            <p className="text-lg text-gray-700 mb-4 animate-fade-in" style={{animationDelay: '0.2s'}}>
               Bienvenue sur la plateforme de gestion des stagiaires et des projets du Ministère du Travail, 
               de l'Emploi et de la Fonction Publique de Madagascar.
             </p>
-            <p className="text-lg text-gray-700 mb-6">
+            <p className="text-lg text-gray-700 mb-6 animate-fade-in" style={{animationDelay: '0.4s'}}>
               Cette plateforme permet de gérer efficacement les stages, les évaluations et les projets
               au sein de notre ministère.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 animate-fade-in" style={{animationDelay: '0.6s'}}>
               <Button 
                 onClick={handleLogin}
-                className="bg-blue-800 hover:bg-blue-900 text-white px-8 py-2 rounded-md"
+                className="bg-blue-800 hover:bg-blue-900 text-white px-8 py-2 rounded-md hover-scale transition-all duration-300"
               >
-                S'inscrire / Se connecter
+                Se connecter
               </Button>
-              <Button variant="outline" className="border-blue-800 text-blue-800 hover:bg-blue-50">
-                En savoir plus
-              </Button>
+              <Dialog open={showMTEFoPInfo} onOpenChange={setShowMTEFoPInfo}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="border-blue-800 text-blue-800 hover:bg-blue-50 hover-scale transition-all duration-300">
+                    En savoir plus
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto animate-scale-in">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-blue-900">Ministère du Travail, de l'Emploi et de la Fonction Publique (MTEFoP)</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-6">
+                    <Card className="animate-fade-in">
+                      <CardHeader>
+                        <CardTitle className="text-blue-800">1. Historique</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>Créé après l'indépendance, le MTEFoP est chargé de la mise en œuvre de la politique gouvernementale en matière de Fonction Publique, d'Emploi, de Travail, de Formation professionnelle et de Lois sociales.</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="animate-fade-in" style={{animationDelay: '0.2s'}}>
+                      <CardHeader>
+                        <CardTitle className="text-blue-800">2. Missions principales</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside space-y-2">
+                          <li>Élaborer et appliquer la politique nationale dans les domaines du travail, de l'emploi et de la fonction publique.</li>
+                          <li>Garantir les droits fondamentaux des travailleurs et renforcer leur sécurité sociale.</li>
+                          <li>Réformer et moderniser la Fonction Publique pour plus d'efficacité.</li>
+                          <li>Favoriser l'employabilité des jeunes, des personnes vulnérables et la professionnalisation des métiers.</li>
+                          <li>Contrôler le respect des lois en matière de gestion des ressources humaines de l'État.</li>
+                          <li>Renforcer la formation continue et les capacités des agents publics.</li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="animate-fade-in" style={{animationDelay: '0.4s'}}>
+                      <CardHeader>
+                        <CardTitle className="text-blue-800">3. Organisation administrative</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside space-y-2">
+                          <li>Le Ministre dirige la politique générale du ministère.</li>
+                          <li>Le Secrétariat Général coordonne l'ensemble des directions centrales et régionales.</li>
+                          <li>Le Cabinet du Ministre conseille et appuie politiquement le Ministre.</li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="animate-fade-in" style={{animationDelay: '0.6s'}}>
+                      <CardHeader>
+                        <CardTitle className="text-blue-800">4. Grandes Directions Générales</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside space-y-2">
+                          <li><strong>Direction Générale du Travail :</strong> gère la législation du travail, la sécurité sociale, le travail décent et la migration professionnelle.</li>
+                          <li><strong>Direction Générale de la Fonction Publique :</strong> supervise la gestion des ressources humaines de l'État, l'éthique, la formation et les réformes.</li>
+                          <li><strong>Direction Générale de la Promotion de l'Emploi :</strong> développe l'insertion professionnelle, la formation continue et l'auto-emploi.</li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="animate-fade-in" style={{animationDelay: '0.8s'}}>
+                      <CardHeader>
+                        <CardTitle className="text-blue-800">5. Établissements sous tutelle</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside space-y-2">
+                          <li>ENAM (École Nationale d'Administration de Madagascar)</li>
+                          <li>INFA (Institut National de Formation Administrative)</li>
+                          <li>CNaPS (Caisse Nationale de Prévoyance Sociale)</li>
+                          <li>INTra (Institut National du Travail)</li>
+                          <li>ONEF (Office National de l'Emploi et de la Formation)</li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           
-          <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-full md:w-1/2 flex justify-center animate-fade-in" style={{animationDelay: '0.8s'}}>
             <div className="relative">
               <img 
                 src="/lovable-uploads/85fb290d-d5c9-45d9-a72b-b63c11346cfa.png" 
                 alt="MTFoP Header" 
-                className="w-full h-auto rounded-lg shadow-lg"
+                className="w-full h-auto rounded-lg shadow-lg hover-scale transition-transform duration-300"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4 rounded-b-lg">
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center animate-fade-in">
                   <img 
                     src="/lovable-uploads/00f9c523-711b-4306-a064-0c9681e407f3.png" 
                     alt="Madagascar Emblem" 
-                    className="h-16 w-auto"
+                    className="h-20 w-auto hover-scale transition-transform duration-300"
                   />
                 </div>
               </div>
@@ -81,26 +159,41 @@ const Index = () => {
         </div>
       </div>
 
+      {/* Enhanced Madagascar Emblem Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-green-50 py-12 animate-fade-in">
+        <div className="container mx-auto px-4 text-center">
+          <div className="flex justify-center mb-8">
+            <img 
+              src="/lovable-uploads/00f9c523-711b-4306-a064-0c9681e407f3.png" 
+              alt="République de Madagascar" 
+              className="h-32 w-auto hover-scale transition-transform duration-500 animate-scale-in"
+            />
+          </div>
+          <h2 className="text-3xl font-bold text-blue-900 mb-4 animate-fade-in">République de Madagascar</h2>
+          <p className="text-xl text-gray-700 animate-fade-in" style={{animationDelay: '0.2s'}}>Fitiavana - Tanindrazana - Fandrosoana</p>
+        </div>
+      </div>
+
       {/* About Section */}
-      <div className="bg-gray-100 py-12">
+      <div className="bg-gray-100 py-12 animate-fade-in">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center text-blue-900 mb-8">À propos du MTFoP</h2>
+          <h2 className="text-2xl font-bold text-center text-blue-900 mb-8 animate-fade-in">À propos du MTFoP</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in">
               <h3 className="text-xl font-bold text-blue-800 mb-3">Notre Mission</h3>
               <p className="text-gray-700">
                 Le Ministère du Travail, de l'Emploi et de la Fonction Publique œuvre pour l'amélioration 
                 des conditions de travail et la promotion de l'emploi à Madagascar.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in" style={{animationDelay: '0.2s'}}>
               <h3 className="text-xl font-bold text-blue-800 mb-3">Nos Services</h3>
               <p className="text-gray-700">
                 Nous offrons divers services pour les employeurs, les employés et les stagiaires, 
                 incluant des programmes de formation et d'insertion professionnelle.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in" style={{animationDelay: '0.4s'}}>
               <h3 className="text-xl font-bold text-blue-800 mb-3">Nos Valeurs</h3>
               <p className="text-gray-700">
                 Intégrité, professionnalisme, transparence et engagement envers le développement 
@@ -112,14 +205,14 @@ const Index = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-blue-900 text-white py-6">
+      <footer className="bg-blue-900 text-white py-6 animate-fade-in">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="mb-4 md:mb-0">© 2025 MTFoP - Tous droits réservés</p>
             <div className="flex space-x-4">
-              <a href="#" className="hover:underline">Mentions légales</a>
-              <a href="#" className="hover:underline">Politique de confidentialité</a>
-              <a href="/contact" className="hover:underline">Contact</a>
+              <a href="#" className="hover:underline transition-all duration-300">Mentions légales</a>
+              <a href="#" className="hover:underline transition-all duration-300">Politique de confidentialité</a>
+              <a href="/contact" className="hover:underline transition-all duration-300">Contact</a>
             </div>
           </div>
         </div>
