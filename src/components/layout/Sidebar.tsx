@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,10 +13,10 @@ export const Sidebar = ({ sidebarOpen, setSidebarOpen, currentPage, onLogout }: 
   const navigate = useNavigate();
 
   const menuItems = [
+    { id: "profile", label: "Mon profil", icon: "👤", path: "/profile" },
     { id: "internships", label: "Gestion des stages", icon: "👥", path: "/internships" },
     { id: "evaluations", label: "Évaluations", icon: "📊", path: "/evaluations" },
     { id: "projects", label: "Projets", icon: "📋", path: "/projects" },
-    { id: "profile", label: "Mon profil", icon: "👤", path: "/profile" },
     { id: "settings", label: "Paramètres", icon: "⚙️", path: "/settings" },
   ];
 

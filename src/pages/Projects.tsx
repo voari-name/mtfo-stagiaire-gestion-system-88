@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectsList from "@/components/projects/ProjectsList";
 import ProjectDetails from "@/components/projects/ProjectDetails";
+import CreateProjectDialog from "@/components/projects/CreateProjectDialog";
 import { useProjects } from "@/hooks/useProjects";
 
 const Projects = () => {
@@ -14,16 +15,19 @@ const Projects = () => {
     isDetailsOpen,
     setIsDetailsOpen,
     handleViewDetails,
+    addProject,
     calculateProgress,
     getStatusColor
   } = useProjects();
+
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   return (
     <MainLayout title="Gestion des projets" currentPage="projects">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Projets</h2>
-          <Button>
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
               <path d="M5 12h14" /><path d="M12 5v14" />
             </svg>
@@ -69,6 +73,12 @@ const Projects = () => {
         open={isDetailsOpen} 
         onOpenChange={setIsDetailsOpen} 
         getStatusColor={getStatusColor}
+      />
+
+      <CreateProjectDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onProjectCreated={addProject}
       />
     </MainLayout>
   );

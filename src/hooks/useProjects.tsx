@@ -22,6 +22,7 @@ export interface Project {
   title: string;
   startDate: string;
   endDate: string;
+  description?: string;
   interns: Intern[];
   tasks: Task[];
 }
@@ -89,6 +90,10 @@ export const useProjects = () => {
     setIsDetailsOpen(true);
   };
 
+  const addProject = (newProject: Project) => {
+    setProjects(prev => [...prev, newProject]);
+  };
+
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
       case "completed": return "bg-green-500";
@@ -104,6 +109,7 @@ export const useProjects = () => {
     isDetailsOpen,
     setIsDetailsOpen,
     handleViewDetails,
+    addProject,
     calculateProgress,
     getStatusColor
   };
