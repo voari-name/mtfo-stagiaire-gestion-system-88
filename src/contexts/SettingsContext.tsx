@@ -1,0 +1,156 @@
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+export interface SettingsContextType {
+  darkMode: boolean;
+  standbyMode: boolean;
+  brightness: number[];
+  language: string;
+  setDarkMode: (value: boolean) => void;
+  setStandbyMode: (value: boolean) => void;
+  setBrightness: (value: number[]) => void;
+  setLanguage: (value: string) => void;
+  translations: { [key: string]: string };
+}
+
+const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+
+const translations = {
+  fr: {
+    'Mon profil': 'Mon profil',
+    'Gestion des stages': 'Gestion des stages',
+    'Évaluations': 'Évaluations',
+    'Projets': 'Projets',
+    'Paramètres': 'Paramètres',
+    'Déconnexion': 'Déconnexion',
+    'Photo de profil': 'Photo de profil',
+    'Informations personnelles': 'Informations personnelles',
+    'Préférences d\'affichage': 'Préférences d\'affichage',
+    'Mode sombre': 'Mode sombre',
+    'Mode veille': 'Mode veille',
+    'Luminosité': 'Luminosité',
+    'Langue de l\'application': 'Langue de l\'application'
+  },
+  en: {
+    'Mon profil': 'My Profile',
+    'Gestion des stages': 'Internship Management',
+    'Évaluations': 'Evaluations',
+    'Projets': 'Projects',
+    'Paramètres': 'Settings',
+    'Déconnexion': 'Logout',
+    'Photo de profil': 'Profile Photo',
+    'Informations personnelles': 'Personal Information',
+    'Préférences d\'affichage': 'Display Preferences',
+    'Mode sombre': 'Dark Mode',
+    'Mode veille': 'Standby Mode',
+    'Luminosité': 'Brightness',
+    'Langue de l\'application': 'Application Language'
+  },
+  mg: {
+    'Mon profil': 'Ny mombamomba ahy',
+    'Gestion des stages': 'Fitantanana ny fampianarana',
+    'Évaluations': 'Fanombanana',
+    'Projets': 'Tetikasa',
+    'Paramètres': 'Parametatra',
+    'Déconnexion': 'Hivoaka',
+    'Photo de profil': 'Sarin\'ny mombamomba',
+    'Informations personnelles': 'Fampahalalana manokana',
+    'Préférences d\'affichage': 'Safidy fampisehoana',
+    'Mode sombre': 'Maizina',
+    'Mode veille': 'Fiandrasana',
+    'Luminosité': 'Fahazavana',
+    'Langue de l\'application': 'Fitenin\'ny rindranasa'
+  }
+};
+
+export const SettingsProvider = ({ children }: { children: ReactNode }) => {
+  const [darkMode, setDarkModeState] = useState(false);
+  const [standbyMode, setStandbyModeState] = useState(false);
+  const [brightness, setBrightnessState] = useState([50]);
+  const [language, setLanguageState] = useState('fr');
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('appSettings');
+    if (savedSettings) {
+      const parsed = JSON.parse(savedSettings);
+      setDarkModeState(parsed.darkMode || false);
+      setStandbyModeState(parsed.standbyMode || false);
+      setBrightnessState(parsed.brightness || [50]);
+      setLanguageState(parsed.language || 'fr');
+    }
+  }, []);
+
+  // Apply dark mode
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // Apply brightness
+  useEffect(() => {
+    document.documentElement.style.filter = `brightness(${brightness[0]}%)`;
+  }, [brightness]);
+
+  // Apply standby mode (reduce brightness when active)
+  useEffect(() => {
+    if (standbyMode) {
+      document.documentElement.style.opacity = '0.7';
+    } else {
+      document.documentElement.style.opacity = '1';
+    }
+  }, [standbyMode]);
+
+  const setDarkMode = (value: boolean) => {
+    setDarkModeState(value);
+    saveSettings({ darkMode: value, standbyMode, brightness, language });
+  };
+
+  const setStandbyMode = (value: boolean) => {
+    setStandbyModeState(value);
+    saveSettings({ darkMode, standbyMode: value, brightness, language });
+  };
+
+  const setBrightness = (value: number[]) => {
+    setBrightnessState(value);
+    saveSettings({ darkMode, standbyMode, brightness: value, language });
+  };
+
+  const setLanguage = (value: string) => {
+    setLanguageState(value);
+    saveSettings({ darkMode, standbyMode, brightness, language: value });
+  };
+
+  const saveSettings = (settings: any) => {
+    localStorage.setItem('appSettings', JSON.stringify(settings));
+  };
+
+  const currentTranslations = translations[language as keyof typeof translations] || translations.fr;
+
+  return (
+    <SettingsContext.Provider value={{
+      darkMode,
+      standbyMode,
+      brightness,
+      language,
+      setDarkMode,
+      setStandbyMode,
+      setBrightness,
+      setLanguage,
+      translations: currentTranslations
+    }}>
+      {children}
+    </SettingsContext.Provider>
+  );
+};
+
+export const useSettings = () => {
+  const context = useContext(SettingsContext);
+  if (context === undefined) {
+    throw new Error('useSettings must be used within a SettingsProvider');
+  }
+  return context;
+};

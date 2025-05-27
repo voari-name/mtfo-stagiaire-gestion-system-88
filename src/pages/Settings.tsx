@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,14 +7,21 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Settings = () => {
-  const [brightness, setBrightness] = useState([50]);
-  const [darkMode, setDarkMode] = useState(false);
-  const [standbyMode, setStandbyMode] = useState(false);
-  const [language, setLanguage] = useState("fr");
-  
   const { toast } = useToast();
+  const { 
+    darkMode, 
+    standbyMode, 
+    brightness, 
+    language, 
+    setDarkMode, 
+    setStandbyMode, 
+    setBrightness, 
+    setLanguage,
+    translations 
+  } = useSettings();
 
   const handleSaveSettings = () => {
     toast({
@@ -48,18 +54,18 @@ const Settings = () => {
   ];
 
   return (
-    <MainLayout title="Paramètres" currentPage="settings" username="RAHAJANIAINA Olivier">
+    <MainLayout title={translations["Paramètres"]} currentPage="settings" username="RAHAJANIAINA Olivier">
       <div className="space-y-6 animate-fade-in">
         <Card className="hover:shadow-lg transition-all duration-300 animate-scale-in">
           <CardHeader>
-            <CardTitle className="text-blue-800">Préférences d'affichage</CardTitle>
+            <CardTitle className="text-blue-800">{translations["Préférences d'affichage"]}</CardTitle>
             <CardDescription>Gérez l'apparence de l'application</CardDescription>
           </CardHeader>
           <CardContent className="space-y-8">
             <div className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="mode">Mode sombre</Label>
+                  <Label htmlFor="mode">{translations["Mode sombre"]}</Label>
                   <Switch 
                     id="mode" 
                     checked={darkMode}
@@ -67,7 +73,7 @@ const Settings = () => {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="standby">Mode veille</Label>
+                  <Label htmlFor="standby">{translations["Mode veille"]}</Label>
                   <Switch 
                     id="standby" 
                     checked={standbyMode}
@@ -79,7 +85,7 @@ const Settings = () => {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="brightness">Luminosité</Label>
+                    <Label htmlFor="brightness">{translations["Luminosité"]}</Label>
                     <span className="text-sm text-muted-foreground">{brightness[0]}%</span>
                   </div>
                   <Slider
@@ -104,7 +110,7 @@ const Settings = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="language">Langue de l'application</Label>
+              <Label htmlFor="language">{translations["Langue de l'application"]}</Label>
               <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger className="w-full transition-all duration-300 focus:scale-105">
                   <SelectValue placeholder="Sélectionnez une langue" />

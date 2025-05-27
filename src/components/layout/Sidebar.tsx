@@ -1,6 +1,8 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -11,13 +13,14 @@ interface SidebarProps {
 
 export const Sidebar = ({ sidebarOpen, setSidebarOpen, currentPage, onLogout }: SidebarProps) => {
   const navigate = useNavigate();
+  const { translations } = useSettings();
 
   const menuItems = [
-    { id: "profile", label: "Mon profil", icon: "👤", path: "/profile" },
-    { id: "internships", label: "Gestion des stages", icon: "👥", path: "/internships" },
-    { id: "evaluations", label: "Évaluations", icon: "📊", path: "/evaluations" },
-    { id: "projects", label: "Projets", icon: "📋", path: "/projects" },
-    { id: "settings", label: "Paramètres", icon: "⚙️", path: "/settings" },
+    { id: "profile", label: translations["Mon profil"], icon: "👤", path: "/profile" },
+    { id: "internships", label: translations["Gestion des stages"], icon: "👥", path: "/internships" },
+    { id: "evaluations", label: translations["Évaluations"], icon: "📊", path: "/evaluations" },
+    { id: "projects", label: translations["Projets"], icon: "📋", path: "/projects" },
+    { id: "settings", label: translations["Paramètres"], icon: "⚙️", path: "/settings" },
   ];
 
   return (
@@ -73,7 +76,7 @@ export const Sidebar = ({ sidebarOpen, setSidebarOpen, currentPage, onLogout }: 
           className="w-full justify-start text-red-600 hover:bg-red-50 hover-scale transition-all duration-300"
         >
           <span className="text-lg">🚪</span>
-          {sidebarOpen && <span className="ml-3 animate-fade-in">Déconnexion</span>}
+          {sidebarOpen && <span className="ml-3 animate-fade-in">{translations["Déconnexion"]}</span>}
         </Button>
       </div>
     </div>

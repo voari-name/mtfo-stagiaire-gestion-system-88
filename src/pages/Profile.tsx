@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,22 +8,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Profile = () => {
   const { toast } = useToast();
+  const { 
+    darkMode, 
+    standbyMode, 
+    brightness, 
+    language, 
+    setDarkMode, 
+    setStandbyMode, 
+    setBrightness, 
+    setLanguage,
+    translations 
+  } = useSettings();
+
   const [profileData, setProfileData] = useState({
     lastName: "RAHAJANIAINA",
     firstName: "Olivier",
     email: "olivierrahajaniaina9@gmail.com",
     phone: "+261 34 00 000 00",
     position: "Administrateur"
-  });
-
-  const [displaySettings, setDisplaySettings] = useState({
-    darkMode: false,
-    standbyMode: false,
-    brightness: [50],
-    language: "fr"
   });
 
   const languages = [
@@ -60,12 +65,12 @@ const Profile = () => {
   };
 
   return (
-    <MainLayout title="Mon profil" currentPage="profile" username="RAHAJANIAINA Olivier">
+    <MainLayout title={translations["Mon profil"]} currentPage="profile" username="RAHAJANIAINA Olivier">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
         <div className="md:col-span-1">
           <Card className="hover:shadow-lg transition-all duration-300 animate-scale-in">
             <CardHeader className="pb-2">
-              <CardTitle className="text-blue-800">Photo de profil</CardTitle>
+              <CardTitle className="text-blue-800">{translations["Photo de profil"]}</CardTitle>
               <CardDescription>Cette photo sera visible par les autres utilisateurs</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-4">
@@ -114,7 +119,7 @@ const Profile = () => {
         <div className="md:col-span-2 space-y-6">
           <Card className="hover:shadow-lg transition-all duration-300 animate-fade-in" style={{animationDelay: '0.2s'}}>
             <CardHeader>
-              <CardTitle className="text-blue-800">Informations personnelles</CardTitle>
+              <CardTitle className="text-blue-800">{translations["Informations personnelles"]}</CardTitle>
               <CardDescription>Gérez vos informations personnelles</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -189,25 +194,25 @@ const Profile = () => {
 
           <Card className="hover:shadow-lg transition-all duration-300 animate-fade-in" style={{animationDelay: '0.4s'}}>
             <CardHeader>
-              <CardTitle className="text-blue-800">Préférences d'affichage</CardTitle>
+              <CardTitle className="text-blue-800">{translations["Préférences d'affichage"]}</CardTitle>
               <CardDescription>Gérez l'apparence de l'application</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="darkMode">Mode sombre</Label>
+                  <Label htmlFor="darkMode">{translations["Mode sombre"]}</Label>
                   <Switch 
                     id="darkMode" 
-                    checked={displaySettings.darkMode}
-                    onCheckedChange={(checked) => setDisplaySettings({...displaySettings, darkMode: checked})}
+                    checked={darkMode}
+                    onCheckedChange={setDarkMode}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="standbyMode">Mode veille</Label>
+                  <Label htmlFor="standbyMode">{translations["Mode veille"]}</Label>
                   <Switch 
                     id="standbyMode" 
-                    checked={displaySettings.standbyMode}
-                    onCheckedChange={(checked) => setDisplaySettings({...displaySettings, standbyMode: checked})}
+                    checked={standbyMode}
+                    onCheckedChange={setStandbyMode}
                   />
                 </div>
               </div>
@@ -215,25 +220,25 @@ const Profile = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="brightness">Luminosité</Label>
-                    <span className="text-sm text-muted-foreground">{displaySettings.brightness[0]}%</span>
+                    <Label htmlFor="brightness">{translations["Luminosité"]}</Label>
+                    <span className="text-sm text-muted-foreground">{brightness[0]}%</span>
                   </div>
                   <Slider
                     id="brightness"
                     min={10}
                     max={100}
                     step={1}
-                    value={displaySettings.brightness}
-                    onValueChange={(value) => setDisplaySettings({...displaySettings, brightness: value})}
+                    value={brightness}
+                    onValueChange={setBrightness}
                     className="transition-all duration-300"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="language">Langue de l'application</Label>
+                  <Label htmlFor="language">{translations["Langue de l'application"]}</Label>
                   <Select 
-                    value={displaySettings.language} 
-                    onValueChange={(value) => setDisplaySettings({...displaySettings, language: value})}
+                    value={language} 
+                    onValueChange={setLanguage}
                   >
                     <SelectTrigger className="w-full transition-all duration-300 focus:scale-105">
                       <SelectValue placeholder="Sélectionnez une langue" />
