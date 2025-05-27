@@ -24,7 +24,7 @@ const Login = () => {
         title: "Connexion réussie",
         description: "Bienvenue sur la plateforme de gestion",
       });
-      navigate("/dashboard");
+      navigate("/profile"); // Redirection vers la page Profil
     } else if (username !== "RAHAJANIAINA") {
       setError("Nom d'utilisateur incorrect");
     } else {
