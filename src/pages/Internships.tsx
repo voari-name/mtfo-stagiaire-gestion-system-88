@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { generateInternPDF } from "@/utils/pdfGenerator";
 
 // Sample data for the internship management
 const initialInterns = [
@@ -94,10 +94,19 @@ const Internships = () => {
   const handleGeneratePdf = (internId: number) => {
     const intern = interns.find(i => i.id === internId);
     if (intern) {
-      toast({
-        title: "PDF généré",
-        description: `Le fichier PDF pour ${intern.firstName} ${intern.lastName} est prêt à être téléchargé.`,
-      });
+      try {
+        generateInternPDF(intern);
+        toast({
+          title: "PDF généré avec succès",
+          description: `Le certificat de stage pour ${intern.firstName} ${intern.lastName} a été téléchargé.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Erreur",
+          description: "Une erreur s'est produite lors de la génération du PDF.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
