@@ -1,12 +1,13 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Index = () => {
   const [showMTEFoPInfo, setShowMTEFoPInfo] = useState(false);
+  const { translations } = useSettings();
   const navigate = useNavigate();
 
   const handleLogin = () => {
@@ -14,7 +15,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-background">
       {/* Header with MTFoP Banner */}
       <div className="w-full bg-gradient-to-r from-red-600 via-white to-green-600 p-4 shadow-md animate-fade-in">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
@@ -40,31 +41,31 @@ const Index = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="flex flex-col md:flex-row items-center gap-8">
           <div className="w-full md:w-1/2 animate-fade-in-up">
-            <h1 className="text-4xl font-bold text-blue-900 mb-6 animate-slide-in-right animate-gradient-text">Système de Gestion des Stagiaires</h1>
-            <p className="text-lg text-gray-700 mb-4 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+            <h1 className="text-4xl font-bold text-blue-900 dark:text-blue-400 mb-6 animate-slide-in-right animate-gradient-text">Système de Gestion des Stagiaires</h1>
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
               Bienvenue sur la plateforme de gestion des stagiaires et des projets du Ministère du Travail, 
               de l'Emploi et de la Fonction Publique de Madagascar.
             </p>
-            <p className="text-lg text-gray-700 mb-6 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-6 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
               Cette plateforme permet de gérer efficacement les stages, les évaluations et les projets
               au sein de notre ministère.
             </p>
             <div className="flex space-x-4 animate-fade-in-up" style={{animationDelay: '0.6s'}}>
               <Button 
                 onClick={handleLogin}
-                className="bg-blue-800 hover:bg-blue-900 text-white px-8 py-2 rounded-md hover-scale transition-all duration-300 animate-pulse-button"
+                className="bg-blue-800 hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-8 py-2 rounded-md hover-scale transition-all duration-300 animate-pulse-button"
               >
                 Se connecter
               </Button>
               <Dialog open={showMTEFoPInfo} onOpenChange={setShowMTEFoPInfo}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="border-blue-800 text-blue-800 hover:bg-blue-50 hover-scale transition-all duration-300">
+                  <Button variant="outline" className="border-blue-800 text-blue-800 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-950 hover-scale transition-all duration-300">
                     En savoir plus
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto animate-scale-in">
                   <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-blue-900">Ministère du Travail, de l'Emploi et de la Fonction Publique (MTEFoP)</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold text-blue-900 dark:text-blue-400">Ministère du Travail, de l'Emploi et de la Fonction Publique (MTEFoP)</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-6">
                     <Card className="animate-fade-in">
@@ -145,22 +146,13 @@ const Index = () => {
                 alt="MTFoP Header" 
                 className="w-full h-auto rounded-lg shadow-lg hover-scale transition-transform duration-300"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4 rounded-b-lg">
-                <div className="flex items-center justify-center animate-fade-in">
-                  <img 
-                    src="/lovable-uploads/00f9c523-711b-4306-a064-0c9681e407f3.png" 
-                    alt="Madagascar Emblem" 
-                    className="h-20 w-auto hover-scale transition-transform duration-300"
-                  />
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* About Section with Enhanced Madagascar Emblem */}
-      <div className="bg-gray-100 py-12 animate-fade-in">
+      <div className="bg-gray-100 dark:bg-card py-12 animate-fade-in">
         <div className="container mx-auto px-4">
           {/* Enhanced Madagascar Emblem positioned above À propos */}
           <div className="text-center mb-12 animate-fade-in-up">
@@ -174,29 +166,29 @@ const Index = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-green-500/20 rounded-full blur-xl animate-pulse-slow"></div>
               </div>
             </div>
-            <h2 className="text-4xl font-bold text-blue-900 mb-4 animate-gradient-text">République de Madagascar</h2>
-            <p className="text-xl text-gray-700 animate-fade-in" style={{animationDelay: '0.2s'}}>Fitiavana - Tanindrazana - Fandrosoana</p>
+            <h2 className="text-4xl font-bold text-blue-900 dark:text-blue-400 mb-4 animate-gradient-text">République de Madagascar</h2>
+            <p className="text-xl text-gray-700 dark:text-gray-300 animate-fade-in" style={{animationDelay: '0.2s'}}>Fitiavana - Tanindrazana - Fandrosoana</p>
           </div>
 
-          <h2 className="text-2xl font-bold text-center text-blue-900 mb-8 animate-fade-in">À propos du MTFoP</h2>
+          <h2 className="text-2xl font-bold text-center text-blue-900 dark:text-blue-400 mb-8 animate-fade-in">À propos du MTFoP</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in-up hover:bg-gradient-to-br hover:from-blue-50 hover:to-white">
-              <h3 className="text-xl font-bold text-blue-800 mb-3">Notre Mission</h3>
-              <p className="text-gray-700">
+            <div className="bg-white dark:bg-card p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in-up hover:bg-gradient-to-br hover:from-blue-50 hover:to-white dark:hover:from-blue-950 dark:hover:to-card">
+              <h3 className="text-xl font-bold text-blue-800 dark:text-blue-400 mb-3">Notre Mission</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 Le Ministère du Travail, de l'Emploi et de la Fonction Publique œuvre pour l'amélioration 
                 des conditions de travail et la promotion de l'emploi à Madagascar.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in-up hover:bg-gradient-to-br hover:from-green-50 hover:to-white" style={{animationDelay: '0.2s'}}>
-              <h3 className="text-xl font-bold text-blue-800 mb-3">Nos Services</h3>
-              <p className="text-gray-700">
+            <div className="bg-white dark:bg-card p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in-up hover:bg-gradient-to-br hover:from-green-50 hover:to-white dark:hover:from-green-950 dark:hover:to-card" style={{animationDelay: '0.2s'}}>
+              <h3 className="text-xl font-bold text-blue-800 dark:text-blue-400 mb-3">Nos Services</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 Nous offrons divers services pour les employeurs, les employés et les stagiaires, 
                 incluant des programmes de formation et d'insertion professionnelle.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in-up hover:bg-gradient-to-br hover:from-red-50 hover:to-white" style={{animationDelay: '0.4s'}}>
-              <h3 className="text-xl font-bold text-blue-800 mb-3">Nos Valeurs</h3>
-              <p className="text-gray-700">
+            <div className="bg-white dark:bg-card p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover-scale animate-fade-in-up hover:bg-gradient-to-br hover:from-red-50 hover:to-white dark:hover:from-red-950 dark:hover:to-card" style={{animationDelay: '0.4s'}}>
+              <h3 className="text-xl font-bold text-blue-800 dark:text-blue-400 mb-3">Nos Valeurs</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 Intégrité, professionnalisme, transparence et engagement envers le développement 
                 du capital humain de Madagascar.
               </p>
@@ -206,7 +198,7 @@ const Index = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-blue-900 text-white py-6 animate-fade-in">
+      <footer className="bg-blue-900 dark:bg-gray-900 text-white py-6 animate-fade-in">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="mb-4 md:mb-0">© 2025 MTFoP - Tous droits réservés</p>

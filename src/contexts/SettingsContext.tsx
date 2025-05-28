@@ -29,7 +29,15 @@ const translations = {
     'Mode sombre': 'Mode sombre',
     'Mode veille': 'Mode veille',
     'Luminosité': 'Luminosité',
-    'Langue de l\'application': 'Langue de l\'application'
+    'Langue de l\'application': 'Langue de l\'application',
+    'Tableau de bord': 'Tableau de bord',
+    'Rechercher': 'Rechercher',
+    'Ajouter un stagiaire': 'Ajouter un stagiaire',
+    'Statut': 'Statut',
+    'Actions': 'Actions',
+    'Modifier': 'Modifier',
+    'Supprimer': 'Supprimer',
+    'Télécharger PDF': 'Télécharger PDF'
   },
   en: {
     'Mon profil': 'My Profile',
@@ -44,7 +52,15 @@ const translations = {
     'Mode sombre': 'Dark Mode',
     'Mode veille': 'Standby Mode',
     'Luminosité': 'Brightness',
-    'Langue de l\'application': 'Application Language'
+    'Langue de l\'application': 'Application Language',
+    'Tableau de bord': 'Dashboard',
+    'Rechercher': 'Search',
+    'Ajouter un stagiaire': 'Add Intern',
+    'Statut': 'Status',
+    'Actions': 'Actions',
+    'Modifier': 'Edit',
+    'Supprimer': 'Delete',
+    'Télécharger PDF': 'Download PDF'
   },
   mg: {
     'Mon profil': 'Ny mombamomba ahy',
@@ -59,7 +75,15 @@ const translations = {
     'Mode sombre': 'Maizina',
     'Mode veille': 'Fiandrasana',
     'Luminosité': 'Fahazavana',
-    'Langue de l\'application': 'Fitenin\'ny rindranasa'
+    'Langue de l\'application': 'Fitenin\'ny rindranasa',
+    'Tableau de bord': 'Sehatr\'asa',
+    'Rechercher': 'Tadiavo',
+    'Ajouter un stagiaire': 'Manampy mpianatra',
+    'Statut': 'Toe-javatra',
+    'Actions': 'Asa',
+    'Modifier': 'Ovay',
+    'Supprimer': 'Fafao',
+    'Télécharger PDF': 'Alao PDF'
   }
 };
 
@@ -81,12 +105,18 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Apply dark mode
+  // Apply dark mode with blue and yellow theme
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
+      document.documentElement.style.setProperty('--primary', '217 91% 60%'); // Blue
+      document.documentElement.style.setProperty('--secondary', '48 96% 53%'); // Yellow
+      document.documentElement.style.setProperty('--accent', '217 91% 60%'); // Blue accent
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.style.removeProperty('--primary');
+      document.documentElement.style.removeProperty('--secondary');
+      document.documentElement.style.removeProperty('--accent');
     }
   }, [darkMode]);
 
