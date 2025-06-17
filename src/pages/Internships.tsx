@@ -1,51 +1,17 @@
 import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateInternPDF } from "@/utils/pdfGenerator";
-
-// Sample data for the internship management
-const initialInterns = [
-  { 
-    id: 1, 
-    firstName: "Jean", 
-    lastName: "Rakoto", 
-    title: "Développement Web", 
-    email: "jean.rakoto@example.com",
-    startDate: "2025-03-01",
-    endDate: "2025-06-01",
-    status: "en cours"
-  },
-  { 
-    id: 2, 
-    firstName: "Marie", 
-    lastName: "Razafy", 
-    title: "Gestion de Projet", 
-    email: "marie.razafy@example.com",
-    startDate: "2025-02-15",
-    endDate: "2025-05-15",
-    status: "en cours"
-  },
-  { 
-    id: 3, 
-    firstName: "Hery", 
-    lastName: "Randriamaro", 
-    title: "Analyse de données", 
-    email: "hery.r@example.com",
-    startDate: "2025-01-10",
-    endDate: "2025-04-10",
-    status: "fin"
-  },
-];
+import { useInternsData } from "@/hooks/useInternsData";
 
 const Internships = () => {
-  const [interns, setInterns] = useState(initialInterns);
+  const { interns, loading, addIntern } = useInternsData();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -56,7 +22,6 @@ const Internships = () => {
     status: "début"
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,48 +32,63 @@ const Internships = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleAddIntern = () => {
-    const newIntern = {
-      id: interns.length + 1,
-      ...formData
-    };
-    
-    setInterns([...interns, newIntern]);
-    setFormData({
-      firstName: "",
-      lastName: "",
-      title: "",
-      email: "",
-      startDate: "",
-      endDate: "",
-      status: "début"
-    });
-    
-    setIsDialogOpen(false);
-    toast({
-      title: "Stagiaire ajouté",
-      description: `${formData.firstName} ${formData.lastName} a été ajouté avec succès.`,
-    });
+  const handleAddIntern = async () => {
+    try {
+      await addIntern({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        title: formData.title,
+        email: formData.email,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        status: formData.status
+      });
+      
+      setFormData({
+        firstName: "",
+        lastName: "",
+        title: "",
+        email: "",
+        startDate: "",
+        endDate: "",
+        status: "début"
+      });
+      
+      setIsDialogOpen(false);
+    } catch (error) {
+      // Error handling is done in the hook
+    }
   };
 
-  const handleGeneratePdf = (internId: number) => {
+  const handleGeneratePdf = (internId: string) => {
     const intern = interns.find(i => i.id === internId);
     if (intern) {
       try {
-        generateInternPDF(intern);
-        toast({
-          title: "PDF généré avec succès",
-          description: `Le certificat de stage pour ${intern.firstName} ${intern.lastName} a été téléchargé.`,
+        generateInternPDF({
+          id: parseInt(intern.id),
+          firstName: intern.firstName,
+          lastName: intern.lastName,
+          title: intern.title,
+          email: intern.email,
+          startDate: intern.startDate,
+          endDate: intern.endDate,
+          status: intern.status
         });
       } catch (error) {
-        toast({
-          title: "Erreur",
-          description: "Une erreur s'est produite lors de la génération du PDF.",
-          variant: "destructive",
-        });
+        console.error('PDF generation error:', error);
       }
     }
   };
+
+  if (loading) {
+    return (
+      <MainLayout title="Gestion des stages" currentPage="internships">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Chargement des données...</div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout title="Gestion des stages" currentPage="internships">
@@ -287,8 +267,7 @@ const Internships = () => {
           
           <TabsContent value="ongoing" className="space-y-6">
             {interns.filter(intern => intern.status === 'en cours').map(intern => (
-              <Card key={intern.id}>
-                {/* Same content structure as "all" tab */}
+              <Card key={intern.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row">
                     <div className="p-6 flex-1">
@@ -345,11 +324,9 @@ const Internships = () => {
           </TabsContent>
           
           <TabsContent value="completed">
-            {/* Filter for completed interns */}
             {interns.filter(intern => intern.status === 'fin').length > 0 ? (
               interns.filter(intern => intern.status === 'fin').map(intern => (
-                <Card key={intern.id}>
-                  {/* Same content structure */}
+                <Card key={intern.id} className="overflow-hidden">
                   <CardContent className="p-0">
                     <div className="flex flex-col md:flex-row">
                       <div className="p-6 flex-1">
@@ -411,13 +388,59 @@ const Internships = () => {
           </TabsContent>
           
           <TabsContent value="starting">
-            {/* Filter for starting interns */}
             {interns.filter(intern => intern.status === 'début').length > 0 ? (
               interns.filter(intern => intern.status === 'début').map(intern => (
-                <Card key={intern.id}>
-                  {/* Same content structure */}
+                <Card key={intern.id} className="overflow-hidden">
                   <CardContent className="p-0">
-                    {/* Content similar to other tabs */}
+                    <div className="flex flex-col md:flex-row">
+                      <div className="p-6 flex-1">
+                        <div className="flex items-center space-x-4 mb-4">
+                          <div className="h-12 w-12 rounded-full bg-blue-800 flex items-center justify-center text-white text-lg font-bold">
+                            {intern.firstName.charAt(0)}{intern.lastName.charAt(0)}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-lg">{intern.firstName} {intern.lastName}</h3>
+                            <p className="text-sm text-muted-foreground">{intern.email}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Intitulé du stage</p>
+                            <p className="font-medium">{intern.title}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Période</p>
+                            <p className="font-medium">
+                              {new Date(intern.startDate).toLocaleDateString('fr-FR')} au {new Date(intern.endDate).toLocaleDateString('fr-FR')}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Statut</p>
+                            <span className="px-3 py-1 rounded-full text-xs font-medium inline-block bg-amber-100 text-amber-800">
+                              À commencer
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-50 p-6 flex flex-col justify-center space-y-3 md:w-48">
+                        <Button onClick={() => handleGeneratePdf(intern.id)}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <path d="M9 15h6" /><path d="M9 18h6" /><path d="M9 12h2" />
+                          </svg>
+                          Télécharger PDF
+                        </Button>
+                        <Button variant="outline">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                            <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                          </svg>
+                          Modifier
+                        </Button>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               ))

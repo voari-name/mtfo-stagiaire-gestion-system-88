@@ -6,21 +6,43 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectsList from "@/components/projects/ProjectsList";
 import ProjectDetails from "@/components/projects/ProjectDetails";
 import CreateProjectDialog from "@/components/projects/CreateProjectDialog";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjectsData } from "@/hooks/useProjectsData";
 
 const Projects = () => {
-  const {
-    projects,
-    selectedProject,
-    isDetailsOpen,
-    setIsDetailsOpen,
-    handleViewDetails,
-    addProject,
-    calculateProgress,
-    getStatusColor
-  } = useProjects();
-
+  const { projects, loading, addProject } = useProjectsData();
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  const calculateProgress = (tasks: any[]) => {
+    if (tasks.length === 0) return 0;
+    const completedCount = tasks.filter(task => task.status === "completed").length;
+    return Math.round((completedCount / tasks.length) * 100);
+  };
+
+  const handleViewDetails = (project: any) => {
+    setSelectedProject(project);
+    setIsDetailsOpen(true);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed": return "bg-green-500";
+      case "in-progress": return "bg-blue-500";
+      case "not-started": return "bg-gray-300";
+      default: return "bg-gray-300";
+    }
+  };
+
+  if (loading) {
+    return (
+      <MainLayout title="Gestion des projets" currentPage="projects">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Chargement des données...</div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout title="Gestion des projets" currentPage="projects">
