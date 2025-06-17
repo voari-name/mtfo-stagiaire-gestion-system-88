@@ -3,10 +3,12 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Project, Task, TaskStatus } from "@/hooks/useProjects";
+import { ProjectData } from "@/hooks/useProjectsData";
+
+type TaskStatus = 'completed' | 'in-progress' | 'not-started';
 
 interface ProjectDetailsProps {
-  project: Project | null;
+  project: ProjectData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   getStatusColor: (status: TaskStatus) => string;
@@ -79,7 +81,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
               {project.tasks.map((task) => (
                 <div key={task.id} className="flex items-center justify-between border-b pb-2">
                   <div className="flex items-center">
-                    <div className={`h-3 w-3 rounded-full mr-3 ${getStatusColor(task.status)}`}></div>
+                    <div className={`h-3 w-3 rounded-full mr-3 ${getStatusColor(task.status as TaskStatus)}`}></div>
                     <span>{task.name}</span>
                   </div>
                   <Badge variant={

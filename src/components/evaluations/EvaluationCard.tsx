@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { EvaluationType } from "@/types/evaluations";
+import { generateEvaluationPDF } from "@/utils/evaluationPdfGenerator";
 
 interface EvaluationCardProps {
   evaluation: EvaluationType;
@@ -13,6 +14,15 @@ interface EvaluationCardProps {
 }
 
 const EvaluationCard = ({ evaluation, onEdit, onDelete, onGeneratePdf }: EvaluationCardProps) => {
+  const handleGeneratePdf = () => {
+    try {
+      generateEvaluationPDF(evaluation);
+      onGeneratePdf(evaluation.id);
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+    }
+  };
+
   return (
     <Card key={evaluation.id} className="overflow-hidden hover:shadow-md transition-shadow">
       <CardContent className="p-0">
@@ -51,12 +61,13 @@ const EvaluationCard = ({ evaluation, onEdit, onDelete, onGeneratePdf }: Evaluat
           </div>
           
           <div className="bg-gray-50 p-6 flex flex-col justify-center space-y-3 md:w-48">
-            <Button onClick={() => onGeneratePdf(evaluation.id)}>
+            <Button onClick={handleGeneratePdf}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                 <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                 <polyline points="14 2 14 8 20 8" />
+                <path d="M9 15h6" /><path d="M9 18h6" /><path d="M9 12h2" />
               </svg>
-              PDF
+              Télécharger PDF
             </Button>
             <Button 
               variant="outline" 

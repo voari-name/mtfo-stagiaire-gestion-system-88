@@ -104,6 +104,32 @@ export const useInternsData = () => {
     }
   };
 
+  const deleteIntern = async (internId: string) => {
+    try {
+      const { error } = await supabase
+        .from('interns')
+        .delete()
+        .eq('id', internId);
+
+      if (error) throw error;
+
+      setInterns(prev => prev.filter(intern => intern.id !== internId));
+      
+      toast({
+        title: "Stagiaire supprimé",
+        description: "Le stagiaire a été supprimé avec succès.",
+      });
+    } catch (error) {
+      console.error('Error deleting intern:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le stagiaire.",
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchInterns();
   }, []);
@@ -112,6 +138,7 @@ export const useInternsData = () => {
     interns,
     loading,
     addIntern,
+    deleteIntern,
     refetch: fetchInterns
   };
 };

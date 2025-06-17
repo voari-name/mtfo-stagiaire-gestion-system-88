@@ -1,12 +1,12 @@
 
 import React from "react";
 import ProjectCard from "./ProjectCard";
-import { Project } from "@/hooks/useProjects";
+import { ProjectData } from "@/hooks/useProjectsData";
 
 interface ProjectsListProps {
-  projects: Project[];
+  projects: ProjectData[];
   calculateProgress: (tasks: any[]) => number;
-  onViewDetails: (project: Project) => void;
+  onViewDetails: (project: ProjectData) => void;
 }
 
 const ProjectsList: React.FC<ProjectsListProps> = ({ 

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,12 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { generateInternPDF } from "@/utils/pdfGenerator";
 import { useInternsData } from "@/hooks/useInternsData";
 
 const Internships = () => {
-  const { interns, loading, addIntern } = useInternsData();
+  const { interns, loading, addIntern, deleteIntern } = useInternsData();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -60,25 +61,96 @@ const Internships = () => {
     }
   };
 
-  const handleGeneratePdf = (internId: string) => {
-    const intern = interns.find(i => i.id === internId);
-    if (intern) {
-      try {
-        generateInternPDF({
-          id: parseInt(intern.id),
-          firstName: intern.firstName,
-          lastName: intern.lastName,
-          title: intern.title,
-          email: intern.email,
-          startDate: intern.startDate,
-          endDate: intern.endDate,
-          status: intern.status
-        });
-      } catch (error) {
-        console.error('PDF generation error:', error);
-      }
+  const handleDeleteIntern = async (internId: string) => {
+    try {
+      await deleteIntern(internId);
+    } catch (error) {
+      // Error handling is done in the hook
     }
   };
+
+  const renderInternCard = (intern: any) => (
+    <Card key={intern.id} className="overflow-hidden">
+      <CardContent className="p-0">
+        <div className="flex flex-col md:flex-row">
+          <div className="p-6 flex-1">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="h-12 w-12 rounded-full bg-blue-800 flex items-center justify-center text-white text-lg font-bold">
+                {intern.firstName.charAt(0)}{intern.lastName.charAt(0)}
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">{intern.firstName} {intern.lastName}</h3>
+                <p className="text-sm text-muted-foreground">{intern.email}</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Intitulé du stage</p>
+                <p className="font-medium">{intern.title}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Période</p>
+                <p className="font-medium">
+                  {new Date(intern.startDate).toLocaleDateString('fr-FR')} au {new Date(intern.endDate).toLocaleDateString('fr-FR')}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Statut</p>
+                <span className={`px-3 py-1 rounded-full text-xs font-medium inline-block ${
+                  intern.status === 'en cours' ? 'bg-blue-100 text-blue-800' :
+                  intern.status === 'fin' ? 'bg-green-100 text-green-800' :
+                  'bg-amber-100 text-amber-800'
+                }`}>
+                  {intern.status === 'en cours' ? 'En cours' : 
+                   intern.status === 'fin' ? 'Terminé' : 'À commencer'}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 p-6 flex flex-col justify-center space-y-3 md:w-48">
+            <Button variant="outline">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+              </svg>
+              Modifier
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                  </svg>
+                  Supprimer
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action supprimera définitivement le stagiaire {intern.firstName} {intern.lastName}.
+                    Cette action ne peut pas être annulée.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => handleDeleteIntern(intern.id)}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   if (loading) {
     return (
@@ -203,183 +275,16 @@ const Internships = () => {
           </TabsList>
           
           <TabsContent value="all" className="space-y-6">
-            {interns.map(intern => (
-              <Card key={intern.id} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="flex flex-col md:flex-row">
-                    <div className="p-6 flex-1">
-                      <div className="flex items-center space-x-4 mb-4">
-                        <div className="h-12 w-12 rounded-full bg-blue-800 flex items-center justify-center text-white text-lg font-bold">
-                          {intern.firstName.charAt(0)}{intern.lastName.charAt(0)}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-lg">{intern.firstName} {intern.lastName}</h3>
-                          <p className="text-sm text-muted-foreground">{intern.email}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Intitulé du stage</p>
-                          <p className="font-medium">{intern.title}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Période</p>
-                          <p className="font-medium">
-                            {new Date(intern.startDate).toLocaleDateString('fr-FR')} au {new Date(intern.endDate).toLocaleDateString('fr-FR')}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Statut</p>
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium inline-block ${
-                            intern.status === 'en cours' ? 'bg-blue-100 text-blue-800' :
-                            intern.status === 'fin' ? 'bg-green-100 text-green-800' :
-                            'bg-amber-100 text-amber-800'
-                          }`}>
-                            {intern.status === 'en cours' ? 'En cours' : 
-                             intern.status === 'fin' ? 'Terminé' : 'À commencer'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gray-50 p-6 flex flex-col justify-center space-y-3 md:w-48">
-                      <Button onClick={() => handleGeneratePdf(intern.id)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                          <polyline points="14 2 14 8 20 8" />
-                          <path d="M9 15h6" /><path d="M9 18h6" /><path d="M9 12h2" />
-                        </svg>
-                        Télécharger PDF
-                      </Button>
-                      <Button variant="outline">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                          <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                        </svg>
-                        Modifier
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {interns.map(renderInternCard)}
           </TabsContent>
           
           <TabsContent value="ongoing" className="space-y-6">
-            {interns.filter(intern => intern.status === 'en cours').map(intern => (
-              <Card key={intern.id} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="flex flex-col md:flex-row">
-                    <div className="p-6 flex-1">
-                      <div className="flex items-center space-x-4 mb-4">
-                        <div className="h-12 w-12 rounded-full bg-blue-800 flex items-center justify-center text-white text-lg font-bold">
-                          {intern.firstName.charAt(0)}{intern.lastName.charAt(0)}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-lg">{intern.firstName} {intern.lastName}</h3>
-                          <p className="text-sm text-muted-foreground">{intern.email}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Intitulé du stage</p>
-                          <p className="font-medium">{intern.title}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Période</p>
-                          <p className="font-medium">
-                            {new Date(intern.startDate).toLocaleDateString('fr-FR')} au {new Date(intern.endDate).toLocaleDateString('fr-FR')}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Statut</p>
-                          <span className="px-3 py-1 rounded-full text-xs font-medium inline-block bg-blue-100 text-blue-800">
-                            En cours
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gray-50 p-6 flex flex-col justify-center space-y-3 md:w-48">
-                      <Button onClick={() => handleGeneratePdf(intern.id)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                          <polyline points="14 2 14 8 20 8" />
-                          <path d="M9 15h6" /><path d="M9 18h6" /><path d="M9 12h2" />
-                        </svg>
-                        Télécharger PDF
-                      </Button>
-                      <Button variant="outline">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                          <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                        </svg>
-                        Modifier
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {interns.filter(intern => intern.status === 'en cours').map(renderInternCard)}
           </TabsContent>
           
           <TabsContent value="completed">
             {interns.filter(intern => intern.status === 'fin').length > 0 ? (
-              interns.filter(intern => intern.status === 'fin').map(intern => (
-                <Card key={intern.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="flex flex-col md:flex-row">
-                      <div className="p-6 flex-1">
-                        <div className="flex items-center space-x-4 mb-4">
-                          <div className="h-12 w-12 rounded-full bg-blue-800 flex items-center justify-center text-white text-lg font-bold">
-                            {intern.firstName.charAt(0)}{intern.lastName.charAt(0)}
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-lg">{intern.firstName} {intern.lastName}</h3>
-                            <p className="text-sm text-muted-foreground">{intern.email}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-sm text-muted-foreground">Intitulé du stage</p>
-                            <p className="font-medium">{intern.title}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Période</p>
-                            <p className="font-medium">
-                              {new Date(intern.startDate).toLocaleDateString('fr-FR')} au {new Date(intern.endDate).toLocaleDateString('fr-FR')}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Statut</p>
-                            <span className="px-3 py-1 rounded-full text-xs font-medium inline-block bg-green-100 text-green-800">
-                              Terminé
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-50 p-6 flex flex-col justify-center space-y-3 md:w-48">
-                        <Button onClick={() => handleGeneratePdf(intern.id)}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                            <polyline points="14 2 14 8 20 8" />
-                            <path d="M9 15h6" /><path d="M9 18h6" /><path d="M9 12h2" />
-                          </svg>
-                          Télécharger PDF
-                        </Button>
-                        <Button variant="outline">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                            <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                          </svg>
-                          Modifier
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+              interns.filter(intern => intern.status === 'fin').map(renderInternCard)
             ) : (
               <div className="text-center py-10">
                 <p className="text-muted-foreground">Aucun stage terminé pour le moment</p>
@@ -389,61 +294,7 @@ const Internships = () => {
           
           <TabsContent value="starting">
             {interns.filter(intern => intern.status === 'début').length > 0 ? (
-              interns.filter(intern => intern.status === 'début').map(intern => (
-                <Card key={intern.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="flex flex-col md:flex-row">
-                      <div className="p-6 flex-1">
-                        <div className="flex items-center space-x-4 mb-4">
-                          <div className="h-12 w-12 rounded-full bg-blue-800 flex items-center justify-center text-white text-lg font-bold">
-                            {intern.firstName.charAt(0)}{intern.lastName.charAt(0)}
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-lg">{intern.firstName} {intern.lastName}</h3>
-                            <p className="text-sm text-muted-foreground">{intern.email}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-sm text-muted-foreground">Intitulé du stage</p>
-                            <p className="font-medium">{intern.title}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Période</p>
-                            <p className="font-medium">
-                              {new Date(intern.startDate).toLocaleDateString('fr-FR')} au {new Date(intern.endDate).toLocaleDateString('fr-FR')}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Statut</p>
-                            <span className="px-3 py-1 rounded-full text-xs font-medium inline-block bg-amber-100 text-amber-800">
-                              À commencer
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-50 p-6 flex flex-col justify-center space-y-3 md:w-48">
-                        <Button onClick={() => handleGeneratePdf(intern.id)}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                            <polyline points="14 2 14 8 20 8" />
-                            <path d="M9 15h6" /><path d="M9 18h6" /><path d="M9 12h2" />
-                          </svg>
-                          Télécharger PDF
-                        </Button>
-                        <Button variant="outline">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                            <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                          </svg>
-                          Modifier
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+              interns.filter(intern => intern.status === 'début').map(renderInternCard)
             ) : (
               <div className="text-center py-10">
                 <p className="text-muted-foreground">Aucun stage à commencer pour le moment</p>
