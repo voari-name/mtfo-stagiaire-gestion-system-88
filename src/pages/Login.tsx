@@ -9,9 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isResetMode, setIsResetMode] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,28 +24,33 @@ const Login = () => {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: username,
+        email: email,
         password: password
       });
 
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          setError("Nom d'utilisateur ou mot de passe incorrect");
+        console.log("Erreur de connexion:", error);
+        if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
+          setError("Email ou mot de passe incorrect. Vérifiez vos identifiants.");
+        } else if (error.message.includes('Email not confirmed')) {
+          setError("Veuillez confirmer votre email avant de vous connecter.");
         } else {
-          setError(error.message);
+          setError(`Erreur: ${error.message}`);
         }
         setLoading(false);
         return;
       }
 
       if (data.user) {
+        console.log("Connexion réussie:", data.user);
         toast({
           title: "Connexion réussie",
-          description: "Bienvenue sur la plateforme de gestion",
+          description: "Bienvenue sur la plateforme de gestion MTFoP",
         });
-        navigate("/profile");
+        navigate("/dashboard");
       }
     } catch (error) {
+      console.error("Erreur lors de la connexion:", error);
       setError("Une erreur est survenue lors de la connexion");
       setLoading(false);
     }
@@ -127,7 +131,7 @@ const Login = () => {
               {isResetMode ? "Réinitialiser le mot de passe" : "Connexion"}
             </CardTitle>
             <CardDescription className="text-center animate-fade-in" style={{animationDelay: '0.2s'}}>
-              {isResetMode ? "Entrez votre email pour recevoir un lien de réinitialisation" : "Entrez vos identifiants pour accéder à la plateforme"}
+              {isResetMode ? "Entrez votre email pour recevoir un lien de réinitialisation" : "Connectez-vous avec vos identifiants MTFoP"}
             </CardDescription>
           </CardHeader>
           <form onSubmit={isResetMode ? handlePasswordReset : handleLogin}>
@@ -135,13 +139,13 @@ const Login = () => {
               {!isResetMode ? (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="username">Email</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
-                      id="username"
+                      id="email"
                       type="email"
-                      placeholder="Entrez votre email"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="olivierrahajaniaina9@gmail.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                       className="transition-all duration-300 focus:scale-105"
                     />
@@ -183,7 +187,7 @@ const Login = () => {
                 </div>
               )}
               {error && (
-                <div className="bg-red-50 text-red-700 px-4 py-2 rounded-md text-sm animate-fade-in">
+                <div className="bg-red-50 text-red-700 px-4 py-2 rounded-md text-sm animate-fade-in border border-red-200">
                   {error}
                 </div>
               )}
