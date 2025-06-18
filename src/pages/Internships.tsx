@@ -16,13 +16,16 @@ const Internships = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    title: "",
     email: "",
     startDate: "",
     endDate: "",
-    status: "début"
+    status: "début",
+    gender: "",
+    photo: ""
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingIntern, setEditingIntern] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,12 +36,24 @@ const Internships = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setFormData({ ...formData, photo: result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddIntern = async () => {
     try {
       await addIntern({
         firstName: formData.firstName,
         lastName: formData.lastName,
-        title: formData.title,
+        title: "", // Keep for compatibility but not used in form
         email: formData.email,
         startDate: formData.startDate,
         endDate: formData.endDate,
@@ -48,17 +63,33 @@ const Internships = () => {
       setFormData({
         firstName: "",
         lastName: "",
-        title: "",
         email: "",
         startDate: "",
         endDate: "",
-        status: "début"
+        status: "début",
+        gender: "",
+        photo: ""
       });
       
       setIsDialogOpen(false);
     } catch (error) {
       // Error handling is done in the hook
     }
+  };
+
+  const handleEditIntern = (intern: any) => {
+    setEditingIntern(intern);
+    setFormData({
+      firstName: intern.firstName,
+      lastName: intern.lastName,
+      email: intern.email,
+      startDate: intern.startDate,
+      endDate: intern.endDate,
+      status: intern.status,
+      gender: intern.gender || "",
+      photo: intern.photo || ""
+    });
+    setIsEditDialogOpen(true);
   };
 
   const handleDeleteIntern = async (internId: string) => {
@@ -86,10 +117,6 @@ const Internships = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground">Intitulé du stage</p>
-                <p className="font-medium">{intern.title}</p>
-              </div>
-              <div>
                 <p className="text-sm text-muted-foreground">Période</p>
                 <p className="font-medium">
                   {new Date(intern.startDate).toLocaleDateString('fr-FR')} au {new Date(intern.endDate).toLocaleDateString('fr-FR')}
@@ -110,7 +137,10 @@ const Internships = () => {
           </div>
           
           <div className="bg-gray-50 p-6 flex flex-col justify-center space-y-3 md:w-48">
-            <Button variant="outline">
+            <Button 
+              variant="outline"
+              onClick={() => handleEditIntern(intern)}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                 <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
               </svg>
@@ -154,7 +184,7 @@ const Internships = () => {
 
   if (loading) {
     return (
-      <MainLayout title="Gestion des stages" currentPage="internships">
+      <MainLayout title="Stagiaires" currentPage="internships">
         <div className="flex items-center justify-center h-64">
           <div className="text-lg">Chargement des données...</div>
         </div>
@@ -163,7 +193,7 @@ const Internships = () => {
   }
 
   return (
-    <MainLayout title="Gestion des stages" currentPage="internships">
+    <MainLayout title="Stagiaires" currentPage="internships">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Stagiaires</h2>
@@ -202,15 +232,6 @@ const Internships = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="title">Intitulé du stage</Label>
-                  <Input 
-                    id="title" 
-                    name="title" 
-                    value={formData.title} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input 
                     id="email" 
@@ -218,6 +239,31 @@ const Internships = () => {
                     type="email" 
                     value={formData.email} 
                     onChange={handleInputChange} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Sexe</Label>
+                  <Select 
+                    value={formData.gender} 
+                    onValueChange={(value) => handleSelectChange("gender", value)}
+                  >
+                    <SelectTrigger id="gender">
+                      <SelectValue placeholder="Sélectionnez le sexe" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="masculin">Masculin</SelectItem>
+                      <SelectItem value="feminin">Féminin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="photo">Photo du stagiaire</Label>
+                  <Input 
+                    id="photo" 
+                    name="photo" 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handlePhotoChange} 
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -265,6 +311,107 @@ const Internships = () => {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Edit Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>Modifier le stagiaire</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="editFirstName">Prénom</Label>
+                  <Input 
+                    id="editFirstName" 
+                    name="firstName" 
+                    value={formData.firstName} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editLastName">Nom</Label>
+                  <Input 
+                    id="editLastName" 
+                    name="lastName" 
+                    value={formData.lastName} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editEmail">Email</Label>
+                <Input 
+                  id="editEmail" 
+                  name="email" 
+                  type="email" 
+                  value={formData.email} 
+                  onChange={handleInputChange} 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editGender">Sexe</Label>
+                <Select 
+                  value={formData.gender} 
+                  onValueChange={(value) => handleSelectChange("gender", value)}
+                >
+                  <SelectTrigger id="editGender">
+                    <SelectValue placeholder="Sélectionnez le sexe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="masculin">Masculin</SelectItem>
+                    <SelectItem value="feminin">Féminin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="editStartDate">Date de début</Label>
+                  <Input 
+                    id="editStartDate" 
+                    name="startDate" 
+                    type="date" 
+                    value={formData.startDate} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editEndDate">Date de fin</Label>
+                  <Input 
+                    id="editEndDate" 
+                    name="endDate" 
+                    type="date" 
+                    value={formData.endDate} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editStatus">Statut</Label>
+                <Select 
+                  value={formData.status} 
+                  onValueChange={(value) => handleSelectChange("status", value)}
+                >
+                  <SelectTrigger id="editStatus">
+                    <SelectValue placeholder="Sélectionnez un statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="début">Début</SelectItem>
+                    <SelectItem value="en cours">En cours</SelectItem>
+                    <SelectItem value="fin">Fin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Annuler</Button>
+              <Button onClick={() => {
+                // Here you would call an update function
+                setIsEditDialogOpen(false);
+              }}>Sauvegarder</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <Tabs defaultValue="all">
           <TabsList className="mb-6">

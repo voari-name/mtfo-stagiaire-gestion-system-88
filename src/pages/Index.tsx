@@ -293,7 +293,7 @@ const Index = () => {
                 className="h-12 w-auto animate-pulse-slow hover-scale transition-transform duration-300"
               />
               <div className="text-center md:text-left">
-                <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 animate-gradient-text drop-shadow-lg">
+                <h3 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 animate-gradient-text drop-shadow-lg animate-pulse">
                   MTFoP 2025
                 </h3>
                 <p className="text-blue-200 text-sm animate-fade-in">Ministère du Travail, de l'Emploi et de la Fonction Publique</p>

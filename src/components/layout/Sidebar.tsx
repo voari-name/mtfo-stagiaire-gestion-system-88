@@ -16,11 +16,12 @@ export const Sidebar = ({ sidebarOpen, setSidebarOpen, currentPage, onLogout }: 
   const { translations } = useSettings();
 
   const menuItems = [
-    { id: "profile", label: translations["Mon profil"], icon: "👤", path: "/profile" },
-    { id: "internships", label: translations["Gestion des stages"], icon: "👥", path: "/internships" },
-    { id: "evaluations", label: translations["Évaluations"], icon: "📊", path: "/evaluations" },
-    { id: "projects", label: translations["Projets"], icon: "📋", path: "/projects" },
-    { id: "settings", label: translations["Paramètres"], icon: "⚙️", path: "/settings" },
+    { id: "profile", label: translations["Profil"] || "Profil", icon: "👤", path: "/profile" },
+    { id: "internships", label: translations["Stagiaires"] || "Stagiaires", icon: "👥", path: "/internships" },
+    { id: "projects", label: translations["Projets"] || "Projets", icon: "📋", path: "/projects" },
+    { id: "evaluations", label: translations["Évaluations"] || "Évaluations", icon: "📊", path: "/evaluations" },
+    { id: "statistics", label: translations["Statistiques"] || "Statistiques", icon: "📈", path: "/statistics" },
+    { id: "settings", label: translations["Paramètres"] || "Paramètres", icon: "⚙️", path: "/settings" },
   ];
 
   return (
@@ -76,7 +77,7 @@ export const Sidebar = ({ sidebarOpen, setSidebarOpen, currentPage, onLogout }: 
           className="w-full justify-start text-red-600 hover:bg-red-50 hover-scale transition-all duration-300"
         >
           <span className="text-lg">🚪</span>
-          {sidebarOpen && <span className="ml-3 animate-fade-in">{translations["Déconnexion"]}</span>}
+          {sidebarOpen && <span className="ml-3 animate-fade-in">{translations["Déconnexion"] || "Déconnexion"}</span>}
         </Button>
       </div>
     </div>
