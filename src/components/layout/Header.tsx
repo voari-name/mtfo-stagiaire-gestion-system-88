@@ -19,15 +19,22 @@ export const Header = ({ title, username = "" }: HeaderProps) => {
     : "";
 
   return (
-    <header className="bg-white shadow-sm z-10 animate-fade-in">
+    <header className="bg-white dark:bg-blue-900 shadow-sm z-10 animate-fade-in">
       <div className="px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-blue-100">{title}</h1>
         <div className="flex items-center space-x-4">
           <NotificationBar />
           {username && (
             <>
-              <span className="text-sm text-gray-600">Bienvenue, {username}</span>
-              <div className="h-8 w-8 rounded-full bg-blue-800 flex items-center justify-center text-white text-sm hover-scale transition-all duration-300">
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/lovable-uploads/bbbcd3ef-0021-42ca-8d32-8796bd1cf670.png" 
+                  alt="User Avatar" 
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+                <span className="text-sm text-gray-600 dark:text-blue-200">Bienvenue, {username}</span>
+              </div>
+              <div className="h-8 w-8 rounded-full bg-blue-800 dark:bg-blue-600 flex items-center justify-center text-white text-sm hover-scale transition-all duration-300">
                 {initials}
               </div>
             </>

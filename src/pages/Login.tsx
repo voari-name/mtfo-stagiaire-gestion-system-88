@@ -6,29 +6,78 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
-    // Check credentials (hardcoded as requested)
-    if (username === "RAHAJANIAINA" && password === "Olivier") {
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur la plateforme de gestion",
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password
       });
-      navigate("/profile"); // Redirection vers la page Profil
-    } else if (username !== "RAHAJANIAINA") {
-      setError("Nom d'utilisateur incorrect");
-    } else {
-      setError("Mot de passe incorrect");
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setError("Nom d'utilisateur ou mot de passe incorrect");
+        } else {
+          setError(error.message);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue sur la plateforme de gestion",
+        });
+        navigate("/profile");
+      }
+    } catch (error) {
+      setError("Une erreur est survenue lors de la connexion");
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Email envoyé",
+        description: "Vérifiez votre boîte mail pour réinitialiser votre mot de passe",
+      });
+      setIsResetMode(false);
+      setEmail("");
+      setLoading(false);
+    } catch (error) {
+      setError("Une erreur est survenue");
+      setLoading(false);
     }
   };
 
@@ -74,51 +123,89 @@ const Login = () => {
                 className="h-16 w-auto hover-scale transition-transform duration-300"
               />
             </div>
-            <CardTitle className="text-2xl font-bold text-center animate-fade-in">Connexion</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center animate-fade-in">
+              {isResetMode ? "Réinitialiser le mot de passe" : "Connexion"}
+            </CardTitle>
             <CardDescription className="text-center animate-fade-in" style={{animationDelay: '0.2s'}}>
-              Entrez vos identifiants pour accéder à la plateforme
+              {isResetMode ? "Entrez votre email pour recevoir un lien de réinitialisation" : "Entrez vos identifiants pour accéder à la plateforme"}
             </CardDescription>
           </CardHeader>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={isResetMode ? handlePasswordReset : handleLogin}>
             <CardContent className="space-y-4 animate-fade-in" style={{animationDelay: '0.4s'}}>
-              <div className="space-y-2">
-                <Label htmlFor="username">Nom d'utilisateur</Label>
-                <Input
-                  id="username"
-                  placeholder="Entrez votre nom d'utilisateur"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="transition-all duration-300 focus:scale-105"
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <a href="#" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                    Mot de passe oublié?
-                  </a>
+              {!isResetMode ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Email</Label>
+                    <Input
+                      id="username"
+                      type="email"
+                      placeholder="Entrez votre email"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                      className="transition-all duration-300 focus:scale-105"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Mot de passe</Label>
+                      <button 
+                        type="button"
+                        onClick={() => setIsResetMode(true)}
+                        className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        Mot de passe oublié?
+                      </button>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Entrez votre mot de passe"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="transition-all duration-300 focus:scale-105"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Entrez votre email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="transition-all duration-300 focus:scale-105"
+                  />
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Entrez votre mot de passe"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="transition-all duration-300 focus:scale-105"
-                />
-              </div>
+              )}
               {error && (
                 <div className="bg-red-50 text-red-700 px-4 py-2 rounded-md text-sm animate-fade-in">
                   {error}
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex flex-col animate-fade-in" style={{animationDelay: '0.6s'}}>
-              <Button type="submit" className="w-full bg-blue-800 hover:bg-blue-900 hover-scale transition-all duration-300">
-                Se connecter - Login
+            <CardFooter className="flex flex-col space-y-2 animate-fade-in" style={{animationDelay: '0.6s'}}>
+              <Button 
+                type="submit" 
+                className="w-full bg-blue-800 hover:bg-blue-900 hover-scale transition-all duration-300"
+                disabled={loading}
+              >
+                {loading ? "Chargement..." : (isResetMode ? "Envoyer le lien" : "Se connecter")}
               </Button>
+              {isResetMode && (
+                <Button 
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsResetMode(false)}
+                  className="w-full"
+                >
+                  Retour à la connexion
+                </Button>
+              )}
             </CardFooter>
           </form>
         </Card>

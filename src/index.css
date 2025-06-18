@@ -46,36 +46,36 @@
   }
 
   .dark {
-    --background: 222 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 40% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 48 96% 53%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
+    --background: 217 32% 15%; /* Bleu foncé attrayant */
+    --foreground: 210 40% 95%; /* Texte clair et lisible */
+    --card: 217 32% 17%; /* Cartes légèrement plus claires */
+    --card-foreground: 210 40% 95%;
+    --popover: 217 32% 17%;
+    --popover-foreground: 210 40% 95%;
+    --primary: 217 91% 60%; /* Bleu vif pour les éléments principaux */
+    --primary-foreground: 217 32% 15%;
+    --secondary: 48 96% 53%; /* Jaune doré pour les accents */
+    --secondary-foreground: 217 32% 15%;
+    --muted: 217 32% 20%; /* Zone muted plus visible */
+    --muted-foreground: 210 40% 70%; /* Texte muted plus lisible */
     --accent: 217 91% 60%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 50%;
     --destructive-foreground: 210 40% 98%;
-    --border: 223 47% 11%;
-    --input: 223 47% 11%;
+    --border: 217 32% 25%; /* Bordures visibles */
+    --input: 217 32% 20%;
     --ring: 217 91% 60%;
-    --sidebar-background: 222 84% 4.9%;
-    --sidebar-foreground: 210 40% 98%;
+    --sidebar-background: 217 32% 12%; /* Sidebar plus foncée */
+    --sidebar-foreground: 210 40% 90%;
     --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 222.2 84% 4.9%;
-    --sidebar-accent: 223 47% 11%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 223 47% 11%;
+    --sidebar-primary-foreground: 217 32% 15%;
+    --sidebar-accent: 217 32% 18%;
+    --sidebar-accent-foreground: 210 40% 95%;
+    --sidebar-border: 217 32% 25%;
     --sidebar-ring: 217 91% 60%;
   }
 
-  /* Mode sombre amélioré avec bleu et jaune */
+  /* Mode sombre amélioré avec couleurs bleues attrayantes */
   .dark body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
@@ -116,6 +116,23 @@
   
   .dark .text-gold {
     color: hsl(var(--secondary));
+  }
+
+  /* Amélioration de la lisibilité en mode sombre */
+  .dark .text-gray-600 {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .dark .text-gray-800 {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .dark .bg-white {
+    background-color: hsl(var(--card)) !important;
+  }
+
+  .dark .shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06) !important;
   }
 }
 

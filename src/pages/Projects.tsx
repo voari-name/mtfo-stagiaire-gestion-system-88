@@ -8,6 +8,7 @@ import ProjectMenuList from "@/components/projects/ProjectMenuList";
 import ProjectDetails from "@/components/projects/ProjectDetails";
 import CreateProjectDialog from "@/components/projects/CreateProjectDialog";
 import { useProjectsData } from "@/hooks/useProjectsData";
+import { BarChart3 } from "lucide-react";
 
 const Projects = () => {
   const { projects, loading, addProject } = useProjectsData();
@@ -25,6 +26,12 @@ const Projects = () => {
   const handleViewDetails = (project: any) => {
     setSelectedProject(project);
     setIsDetailsOpen(true);
+  };
+
+  const handleViewStatistics = () => {
+    // Pour l'instant, on affiche une notification
+    // Plus tard, on pourra ajouter une page ou modal de statistiques
+    console.log("Afficher statistiques des projets");
   };
 
   const getStatusColor = (status: string) => {
@@ -83,12 +90,22 @@ const Projects = () => {
               </Button>
             </div>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-              <path d="M5 12h14" /><path d="M12 5v14" />
-            </svg>
-            Nouveau projet
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline" 
+              onClick={handleViewStatistics}
+              className="flex items-center gap-2"
+            >
+              <BarChart3 size={16} />
+              Statistiques
+            </Button>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                <path d="M5 12h14" /><path d="M12 5v14" />
+              </svg>
+              Nouveau projet
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="all">
