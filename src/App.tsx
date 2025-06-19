@@ -1,43 +1,44 @@
 
 import { Toaster } from "@/components/ui/toaster";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Internships from "./pages/Internships";
-import Evaluations from "./pages/Evaluations";
 import Projects from "./pages/Projects";
+import Attestations from "./pages/Attestations";
+import Statistics from "./pages/Statistics";
 import Settings from "./pages/Settings";
-import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
-import { SettingsProvider } from "./contexts/SettingsContext";
 
 const queryClient = new QueryClient();
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <SettingsProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-50">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/internships" element={<Internships />} />
-              <Route path="/evaluations" element={<Evaluations />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-          </div>
-        </Router>
-      </SettingsProvider>
-    </QueryClientProvider>
-  );
-}
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <SettingsProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/internships" element={<Internships />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/evaluations" element={<Attestations />} />
+            <Route path="/statistics" element={<Statistics />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </SettingsProvider>
+  </QueryClientProvider>
+);
 
 export default App;

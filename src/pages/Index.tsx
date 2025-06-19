@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 
 const Index = () => {
   const [showMTEFoPInfo, setShowMTEFoPInfo] = useState(false);
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
   const { translations } = useSettings();
   const navigate = useNavigate();
 
@@ -16,7 +17,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800">
       {/* Header with MTFoP Banner */}
       <div className="w-full bg-gradient-to-r from-red-600 via-white to-green-600 p-4 shadow-md animate-fade-in">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
@@ -38,8 +39,39 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto py-8 px-4">
+      {/* Hero Section */}
+      <main className="container mx-auto px-4 py-20">
+        <div className="text-center mb-16 animate-fade-in">
+          <h1 className="text-5xl md:text-7xl font-bold text-blue-900 dark:text-blue-100 mb-6">
+            Bienvenue sur <span className="text-blue-600 dark:text-blue-300">MTeFoP</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-blue-700 dark:text-blue-200 mb-8 max-w-3xl mx-auto">
+            Système de gestion des stages - Ministère du Travail, de l'Emploi et de la Fonction Publique
+          </p>
+          <p className="text-lg text-blue-600 dark:text-blue-300 mb-12 max-w-2xl mx-auto">
+            Plateforme moderne pour la gestion, le suivi et l'évaluation des stagiaires
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              onClick={() => navigate('/login')}
+              className="bg-blue-800 hover:bg-blue-900 text-white px-8 py-3 text-lg hover-scale transition-all duration-300"
+            >
+              Se connecter
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => setShowMoreInfo(true)}
+              className="border-blue-800 text-blue-800 hover:bg-blue-800 hover:text-white px-8 py-3 text-lg hover-scale transition-all duration-300"
+            >
+              En savoir plus
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Content */}
         <div className="flex flex-col md:flex-row items-center gap-8">
           <div className="w-full md:w-1/2 animate-fade-in-up">
             <h1 className="text-4xl font-bold text-blue-900 dark:text-blue-400 mb-6 animate-slide-in-right animate-gradient-text">Système de Gestion des Stagiaires</h1>
@@ -234,7 +266,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* About Section with Enhanced Madagascar Emblem */}
       <div className="bg-gray-100 dark:bg-card py-12 animate-fade-in">
@@ -323,6 +355,15 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* MTeFoP 2025 Footer */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white px-6 py-3 rounded-full shadow-lg animate-pulse">
+          <span className="font-bold text-lg bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent animate-fade-in">
+            MTeFoP 2025
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

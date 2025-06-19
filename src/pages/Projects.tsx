@@ -8,14 +8,17 @@ import ProjectMenuList from "@/components/projects/ProjectMenuList";
 import ProjectDetails from "@/components/projects/ProjectDetails";
 import CreateProjectDialog from "@/components/projects/CreateProjectDialog";
 import { useProjectsData } from "@/hooks/useProjectsData";
-import { BarChart3 } from "lucide-react";
+import { useInternsData } from "@/hooks/useInternsData";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UserPlus } from "lucide-react";
 
 const Projects = () => {
   const { projects, loading, addProject } = useProjectsData();
+  const { interns } = useInternsData();
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedIntern, setSelectedIntern] = useState<string>("");
 
   const calculateProgress = (tasks: any[]) => {
     if (tasks.length === 0) return 0;
@@ -28,10 +31,11 @@ const Projects = () => {
     setIsDetailsOpen(true);
   };
 
-  const handleViewStatistics = () => {
-    // Pour l'instant, on affiche une notification
-    // Plus tard, on pourra ajouter une page ou modal de statistiques
-    console.log("Afficher statistiques des projets");
+  const handleAssignIntern = () => {
+    if (selectedIntern) {
+      console.log("Assigning intern:", selectedIntern, "to projects");
+      // Here you would implement the logic to assign intern to project
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -56,50 +60,38 @@ const Projects = () => {
   return (
     <MainLayout title="Gestion des projets" currentPage="projects">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <h2 className="text-2xl font-bold">Projets</h2>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 className="text-3xl font-bold text-gray-800">Gestion des Projets</h2>
+          
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2">
+              <Select value={selectedIntern} onValueChange={setSelectedIntern}>
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="Sélectionner un stagiaire" />
+                </SelectTrigger>
+                <SelectContent>
+                  {interns.map((intern) => (
+                    <SelectItem key={intern.id} value={intern.id}>
+                      {intern.firstName} {intern.lastName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button 
+                onClick={handleAssignIntern}
+                disabled={!selectedIntern}
+                variant="outline"
+                className="border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                  <rect width="7" height="7" x="3" y="3" rx="1"/>
-                  <rect width="7" height="7" x="14" y="3" rx="1"/>
-                  <rect width="7" height="7" x="14" y="14" rx="1"/>
-                  <rect width="7" height="7" x="3" y="14" rx="1"/>
-                </svg>
-                Grille
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                  <line x1="8" x2="21" y1="6" y2="6"/>
-                  <line x1="8" x2="21" y1="12" y2="12"/>
-                  <line x1="8" x2="21" y1="18" y2="18"/>
-                  <line x1="3" x2="3.01" y1="6" y2="6"/>
-                  <line x1="3" x2="3.01" y1="12" y2="12"/>
-                  <line x1="3" x2="3.01" y1="18" y2="18"/>
-                </svg>
-                Liste
+                <UserPlus className="w-4 h-4 mr-2" />
+                Assigner
               </Button>
             </div>
-          </div>
-          <div className="flex space-x-2">
+            
             <Button 
-              variant="outline" 
-              onClick={handleViewStatistics}
-              className="flex items-center gap-2"
+              onClick={() => setIsCreateDialogOpen(true)}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
             >
-              <BarChart3 size={16} />
-              Statistiques
-            </Button>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                 <path d="M5 12h14" /><path d="M12 5v14" />
               </svg>
@@ -108,56 +100,41 @@ const Projects = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="all">
-          <TabsList className="mb-6">
-            <TabsTrigger value="all">Tous</TabsTrigger>
-            <TabsTrigger value="active">En cours</TabsTrigger>
-            <TabsTrigger value="completed">Terminés</TabsTrigger>
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="mb-6 bg-blue-50">
+            <TabsTrigger value="all" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Tous les projets
+            </TabsTrigger>
+            <TabsTrigger value="active" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Projets actifs
+            </TabsTrigger>
+            <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Projets terminés
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="all" className="space-y-6">
-            {viewMode === 'grid' ? (
-              <ProjectsList 
-                projects={projects} 
-                calculateProgress={calculateProgress}
-                onViewDetails={handleViewDetails}
-              />
-            ) : (
-              <ProjectMenuList 
-                projects={projects} 
-                onProjectClick={handleViewDetails}
-              />
-            )}
+            <ProjectsList 
+              projects={projects} 
+              calculateProgress={calculateProgress}
+              onViewDetails={handleViewDetails}
+            />
           </TabsContent>
           
           <TabsContent value="active">
-            {viewMode === 'grid' ? (
-              <ProjectsList 
-                projects={projects.filter(p => p.interns.some(i => i.status === "en cours"))} 
-                calculateProgress={calculateProgress}
-                onViewDetails={handleViewDetails}
-              />
-            ) : (
-              <ProjectMenuList 
-                projects={projects.filter(p => p.interns.some(i => i.status === "en cours"))} 
-                onProjectClick={handleViewDetails}
-              />
-            )}
+            <ProjectsList 
+              projects={projects.filter(p => p.interns.some(i => i.status === "en cours"))} 
+              calculateProgress={calculateProgress}
+              onViewDetails={handleViewDetails}
+            />
           </TabsContent>
           
           <TabsContent value="completed">
-            {viewMode === 'grid' ? (
-              <ProjectsList 
-                projects={projects.filter(p => p.interns.every(i => i.status === "fin"))} 
-                calculateProgress={calculateProgress}
-                onViewDetails={handleViewDetails}
-              />
-            ) : (
-              <ProjectMenuList 
-                projects={projects.filter(p => p.interns.every(i => i.status === "fin"))} 
-                onProjectClick={handleViewDetails}
-              />
-            )}
+            <ProjectsList 
+              projects={projects.filter(p => p.interns.every(i => i.status === "fin"))} 
+              calculateProgress={calculateProgress}
+              onViewDetails={handleViewDetails}
+            />
           </TabsContent>
         </Tabs>
       </div>
