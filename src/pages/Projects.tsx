@@ -4,13 +4,11 @@ import MainLayout from "@/components/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectsList from "@/components/projects/ProjectsList";
-import ProjectMenuList from "@/components/projects/ProjectMenuList";
 import ProjectDetails from "@/components/projects/ProjectDetails";
 import CreateProjectDialog from "@/components/projects/CreateProjectDialog";
+import AssignInternDialog from "@/components/projects/AssignInternDialog";
 import { useProjectsData } from "@/hooks/useProjectsData";
 import { useInternsData } from "@/hooks/useInternsData";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus } from "lucide-react";
 
 const Projects = () => {
   const { projects, loading, addProject } = useProjectsData();
@@ -18,7 +16,7 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [selectedIntern, setSelectedIntern] = useState<string>("");
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
 
   const calculateProgress = (tasks: any[]) => {
     if (tasks.length === 0) return 0;
@@ -29,13 +27,6 @@ const Projects = () => {
   const handleViewDetails = (project: any) => {
     setSelectedProject(project);
     setIsDetailsOpen(true);
-  };
-
-  const handleAssignIntern = () => {
-    if (selectedIntern) {
-      console.log("Assigning intern:", selectedIntern, "to projects");
-      // Here you would implement the logic to assign intern to project
-    }
   };
 
   const getStatusColor = (status: string) => {
@@ -64,29 +55,13 @@ const Projects = () => {
           <h2 className="text-3xl font-bold text-gray-800">Gestion des Projets</h2>
           
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <div className="flex items-center gap-2">
-              <Select value={selectedIntern} onValueChange={setSelectedIntern}>
-                <SelectTrigger className="w-64">
-                  <SelectValue placeholder="Sélectionner un stagiaire" />
-                </SelectTrigger>
-                <SelectContent>
-                  {interns.map((intern) => (
-                    <SelectItem key={intern.id} value={intern.id}>
-                      {intern.firstName} {intern.lastName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button 
-                onClick={handleAssignIntern}
-                disabled={!selectedIntern}
-                variant="outline"
-                className="border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white"
-              >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Assigner
-              </Button>
-            </div>
+            <Button 
+              onClick={() => setIsAssignDialogOpen(true)}
+              variant="outline"
+              className="border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white"
+            >
+              Assigner un stagiaire
+            </Button>
             
             <Button 
               onClick={() => setIsCreateDialogOpen(true)}
@@ -100,38 +75,16 @@ const Projects = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="all" className="w-full">
+        <Tabs defaultValue="ongoing" className="w-full">
           <TabsList className="mb-6 bg-blue-50">
-            <TabsTrigger value="all" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              Tous les projets
-            </TabsTrigger>
-            <TabsTrigger value="active" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              Projets actifs
-            </TabsTrigger>
-            <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              Projets terminés
+            <TabsTrigger value="ongoing" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              En cours ({projects.filter(p => p.interns.some(i => i.status === "en cours")).length})
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="all" className="space-y-6">
-            <ProjectsList 
-              projects={projects} 
-              calculateProgress={calculateProgress}
-              onViewDetails={handleViewDetails}
-            />
-          </TabsContent>
-          
-          <TabsContent value="active">
+          <TabsContent value="ongoing">
             <ProjectsList 
               projects={projects.filter(p => p.interns.some(i => i.status === "en cours"))} 
-              calculateProgress={calculateProgress}
-              onViewDetails={handleViewDetails}
-            />
-          </TabsContent>
-          
-          <TabsContent value="completed">
-            <ProjectsList 
-              projects={projects.filter(p => p.interns.every(i => i.status === "fin"))} 
               calculateProgress={calculateProgress}
               onViewDetails={handleViewDetails}
             />
@@ -150,6 +103,13 @@ const Projects = () => {
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         onProjectCreated={addProject}
+      />
+
+      <AssignInternDialog
+        open={isAssignDialogOpen}
+        onOpenChange={setIsAssignDialogOpen}
+        projects={projects}
+        interns={interns}
       />
     </MainLayout>
   );
