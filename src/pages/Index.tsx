@@ -51,6 +51,74 @@ const Index = () => {
           <p className="text-lg text-blue-600 dark:text-blue-300 mb-12 max-w-2xl mx-auto">
             Plateforme moderne pour la gestion, le suivi et l'évaluation des stagiaires
           </p>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{animationDelay: '0.3s'}}>
+            <Button 
+              onClick={handleLogin}
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-8 py-3 text-lg hover-scale transition-all duration-300 transform hover:shadow-xl"
+            >
+              Se connecter
+            </Button>
+            
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg hover-scale transition-all duration-300 transform hover:shadow-xl"
+                >
+                  En savoir plus
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] animate-scale-in">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold text-blue-900 flex items-center gap-3">
+                    <img 
+                      src="/lovable-uploads/bbbcd3ef-0021-42ca-8d32-8796bd1cf670.png" 
+                      alt="MTeFoP Logo" 
+                      className="h-8 w-auto"
+                    />
+                    À propos du MTeFoP
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 text-gray-700">
+                  <p className="text-lg">
+                    Le Ministère du Travail, de l'Emploi et de la Fonction Publique (MTeFoP) 
+                    est un département gouvernemental clé de la République de Madagascar.
+                  </p>
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-blue-800">Notre Mission</h3>
+                    <p>
+                      Nous œuvrons pour l'amélioration des conditions de travail, la promotion de l'emploi, 
+                      et le développement de la fonction publique à Madagascar.
+                    </p>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-blue-800">Cette Plateforme</h3>
+                    <p>
+                      Ce système de gestion des stagiaires permet de :
+                    </p>
+                    <ul className="list-disc list-inside space-y-1 ml-4">
+                      <li>Gérer efficacement les stages au sein du ministère</li>
+                      <li>Suivre les projets et les évaluations des stagiaires</li>
+                      <li>Générer des attestations officielles</li>
+                      <li>Analyser les statistiques et performances</li>
+                    </ul>
+                  </div>
+                  <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600">
+                    <p className="text-sm italic text-blue-800">
+                      "Fitiavana - Tanindrazana - Fandrosoana"
+                    </p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      Devise de la République de Madagascar
+                    </p>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Main Content */}
