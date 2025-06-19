@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,9 +44,10 @@ const Login = () => {
         console.log("Connexion réussie:", data.user);
         toast({
           title: "Connexion réussie",
-          description: "Bienvenue sur la plateforme de gestion MTFoP",
+          description: "Bienvenue sur la plateforme de gestion MTeFoP",
         });
-        navigate("/dashboard");
+        // Redirection vers le profil avec animation
+        navigate("/profile");
       }
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
@@ -87,7 +87,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      {/* Banner MTFoP */}
+      {/* Banner MTeFoP */}
       <div className="w-full bg-gradient-to-r from-red-600 via-white to-green-600 p-3 shadow-lg animate-fade-in">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
@@ -96,12 +96,12 @@ const Login = () => {
           <div className="flex justify-center">
             <img 
               src="/lovable-uploads/bbbcd3ef-0021-42ca-8d32-8796bd1cf670.png" 
-              alt="MTFoP Logo" 
+              alt="MTeFoP Logo" 
               className="h-16 w-auto animate-scale-in"
             />
           </div>
           <div className="text-right">
-            <p className="text-sm font-semibold text-green-800">MTFoP</p>
+            <p className="text-sm font-semibold text-green-800">MTeFoP</p>
           </div>
         </div>
       </div>
@@ -118,20 +118,20 @@ const Login = () => {
           </Button>
         </div>
         
-        <Card className="w-full max-w-md mx-4 shadow-2xl border-t-4 border-t-blue-800 animate-scale-in">
+        <Card className="w-full max-w-md mx-4 shadow-2xl border-t-4 border-t-blue-800 animate-scale-in transform transition-all duration-500 hover:scale-105">
           <CardHeader className="space-y-1 flex items-center flex-col">
             <div className="flex justify-center mb-4 animate-fade-in">
               <img 
                 src="/lovable-uploads/bbbcd3ef-0021-42ca-8d32-8796bd1cf670.png" 
-                alt="MTFoP Logo" 
-                className="h-16 w-auto hover-scale transition-transform duration-300"
+                alt="MTeFoP Logo" 
+                className="h-16 w-auto hover-scale transition-transform duration-300 animate-bounce"
               />
             </div>
-            <CardTitle className="text-2xl font-bold text-center animate-fade-in">
+            <CardTitle className="text-2xl font-bold text-center animate-fade-in bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
               {isResetMode ? "Réinitialiser le mot de passe" : "Connexion"}
             </CardTitle>
             <CardDescription className="text-center animate-fade-in" style={{animationDelay: '0.2s'}}>
-              {isResetMode ? "Entrez votre email pour recevoir un lien de réinitialisation" : "Connectez-vous avec vos identifiants MTFoP"}
+              {isResetMode ? "Entrez votre email pour recevoir un lien de réinitialisation" : "Connectez-vous avec vos identifiants MTeFoP"}
             </CardDescription>
           </CardHeader>
           <form onSubmit={isResetMode ? handlePasswordReset : handleLogin}>
@@ -147,7 +147,7 @@ const Login = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="transition-all duration-300 focus:scale-105"
+                      className="transition-all duration-300 focus:scale-105 focus:shadow-lg border-2 focus:border-blue-500"
                     />
                   </div>
                   <div className="space-y-2">
@@ -156,7 +156,7 @@ const Login = () => {
                       <button 
                         type="button"
                         onClick={() => setIsResetMode(true)}
-                        className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                        className="text-sm text-blue-600 hover:text-blue-800 transition-colors hover:underline"
                       >
                         Mot de passe oublié?
                       </button>
@@ -168,7 +168,7 @@ const Login = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="transition-all duration-300 focus:scale-105"
+                      className="transition-all duration-300 focus:scale-105 focus:shadow-lg border-2 focus:border-blue-500"
                     />
                   </div>
                 </>
@@ -182,12 +182,12 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="transition-all duration-300 focus:scale-105"
+                    className="transition-all duration-300 focus:scale-105 focus:shadow-lg border-2 focus:border-blue-500"
                   />
                 </div>
               )}
               {error && (
-                <div className="bg-red-50 text-red-700 px-4 py-2 rounded-md text-sm animate-fade-in border border-red-200">
+                <div className="bg-red-50 text-red-700 px-4 py-2 rounded-md text-sm animate-fade-in border border-red-200 shadow-sm">
                   {error}
                 </div>
               )}
@@ -195,17 +195,24 @@ const Login = () => {
             <CardFooter className="flex flex-col space-y-2 animate-fade-in" style={{animationDelay: '0.6s'}}>
               <Button 
                 type="submit" 
-                className="w-full bg-blue-800 hover:bg-blue-900 hover-scale transition-all duration-300"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 hover-scale transition-all duration-300 transform hover:shadow-lg"
                 disabled={loading}
               >
-                {loading ? "Chargement..." : (isResetMode ? "Envoyer le lien" : "Se connecter")}
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Chargement...
+                  </div>
+                ) : (
+                  isResetMode ? "Envoyer le lien" : "Se connecter"
+                )}
               </Button>
               {isResetMode && (
                 <Button 
                   type="button"
                   variant="ghost"
                   onClick={() => setIsResetMode(false)}
-                  className="w-full"
+                  className="w-full hover-scale transition-all duration-300"
                 >
                   Retour à la connexion
                 </Button>
