@@ -4,12 +4,15 @@ import MainLayout from "@/components/MainLayout";
 import AttestationsHeader from "@/components/attestations/AttestationsHeader";
 import AttestationCard from "@/components/attestations/AttestationCard";
 import EmptyAttestationsState from "@/components/attestations/EmptyAttestationsState";
+import { CreateEvaluationDialog } from "@/components/evaluations/CreateEvaluationDialog";
 import { useInternsData } from "@/hooks/useInternsData";
 import { useProjectsData } from "@/hooks/useProjectsData";
+import { useEvaluations } from "@/hooks/useEvaluations";
 
 const Attestations = () => {
   const { interns, loading: internsLoading } = useInternsData();
   const { projects, loading: projectsLoading } = useProjectsData();
+  const { evaluations, addEvaluation } = useEvaluations();
 
   const loading = internsLoading || projectsLoading;
 
@@ -45,7 +48,7 @@ const Attestations = () => {
 
   if (loading) {
     return (
-      <MainLayout title="Attestations" currentPage="evaluations">
+      <MainLayout title="Évaluations" currentPage="evaluations">
         <div className="flex items-center justify-center h-64">
           <div className="text-lg">Chargement des données...</div>
         </div>
@@ -54,9 +57,12 @@ const Attestations = () => {
   }
 
   return (
-    <MainLayout title="Attestations" currentPage="evaluations">
+    <MainLayout title="Évaluations" currentPage="evaluations">
       <div className="space-y-6">
-        <AttestationsHeader eligibleInternsCount={eligibleInterns.length} />
+        <div className="flex justify-between items-center">
+          <AttestationsHeader eligibleInternsCount={eligibleInterns.length} />
+          <CreateEvaluationDialog onEvaluationCreated={addEvaluation} />
+        </div>
         
         {internsWithEvaluations.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

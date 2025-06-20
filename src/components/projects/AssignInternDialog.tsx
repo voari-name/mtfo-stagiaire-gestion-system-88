@@ -2,10 +2,9 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 interface AssignInternDialogProps {
@@ -13,6 +12,7 @@ interface AssignInternDialogProps {
   onOpenChange: (open: boolean) => void;
   projects: any[];
   interns: any[];
+  onAssignmentSuccess?: () => void;
 }
 
 const predefinedProjects = [
@@ -32,203 +32,152 @@ const AssignInternDialog: React.FC<AssignInternDialogProps> = ({
   open,
   onOpenChange,
   projects,
-  interns
+  interns,
+  onAssignmentSuccess
 }) => {
-  const [formData, setFormData] = useState({
-    lastName: "",
-    firstName: "",
-    projectTitle: "",
-    customProject: "",
-    useCustomProject: false,
-    startDate: "",
-    endDate: "",
-    status: "en cours"
-  });
+  const [selectedProject, setSelectedProject] = useState("");
+  const [customProject, setCustomProject] = useState("");
+  const [selectedIntern, setSelectedIntern] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [isCustomProject, setIsCustomProject] = useState(false);
   const { toast } = useToast();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const availableInterns = interns.filter(intern => intern.status === 'en cours');
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData({ ...formData, [name]: value });
-    if (name === "projectTitle" && value === "custom") {
-      setFormData(prev => ({ ...prev, useCustomProject: true, projectTitle: "" }));
-    } else if (name === "projectTitle") {
-      setFormData(prev => ({ ...prev, useCustomProject: false, customProject: "" }));
-    }
-  };
-
-  const handleSave = () => {
-    const finalProjectTitle = formData.useCustomProject ? formData.customProject : formData.projectTitle;
+  const handleSubmit = () => {
+    const projectTitle = isCustomProject ? customProject : selectedProject;
     
-    if (!formData.lastName || !formData.firstName || !finalProjectTitle) {
+    if (!projectTitle || !selectedIntern || !startDate || !endDate) {
       toast({
         title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires.",
+        description: "Veuillez remplir tous les champs",
         variant: "destructive"
       });
       return;
     }
 
-    console.log("Assigning intern to project:", {
-      ...formData,
-      finalProjectTitle
-    });
+    const selectedInternData = availableInterns.find(intern => intern.id === selectedIntern);
     
-    toast({
-      title: "Stagiaire assigné",
-      description: `${formData.firstName} ${formData.lastName} a été assigné au projet "${finalProjectTitle}".`,
-    });
-
-    setFormData({
-      lastName: "",
-      firstName: "",
-      projectTitle: "",
-      customProject: "",
-      useCustomProject: false,
-      startDate: "",
-      endDate: "",
-      status: "en cours"
-    });
-    
-    onOpenChange(false);
+    if (selectedInternData) {
+      toast({
+        title: "Assignment réussi",
+        description: `${selectedInternData.firstName} ${selectedInternData.lastName} a été assigné au projet: ${projectTitle}`,
+      });
+      
+      // Reset form
+      setSelectedProject("");
+      setCustomProject("");
+      setSelectedIntern("");
+      setStartDate("");
+      setEndDate("");
+      setIsCustomProject(false);
+      
+      if (onAssignmentSuccess) {
+        onAssignmentSuccess();
+      }
+      
+      onOpenChange(false);
+    }
   };
 
-  const handleCancel = () => {
-    setFormData({
-      lastName: "",
-      firstName: "",
-      projectTitle: "",
-      customProject: "",
-      useCustomProject: false,
-      startDate: "",
-      endDate: "",
-      status: "en cours"
-    });
-    onOpenChange(false);
+  const handleProjectChange = (value: string) => {
+    if (value === "custom") {
+      setIsCustomProject(true);
+      setSelectedProject("");
+    } else {
+      setIsCustomProject(false);
+      setSelectedProject(value);
+      setCustomProject("");
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-800">
+          <DialogTitle className="text-xl font-bold text-gray-800">
             Assigner un stagiaire à un projet
           </DialogTitle>
         </DialogHeader>
         
-        <div className="grid gap-6 py-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-sm font-semibold text-gray-800">Nom *</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                placeholder="Nom du stagiaire"
-                className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-sm font-semibold text-gray-800">Prénom *</Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                placeholder="Prénom du stagiaire"
-                className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <Label htmlFor="projectTitle" className="text-sm font-semibold text-gray-800">Sélectionner un projet *</Label>
-            <Select 
-              value={formData.useCustomProject ? "custom" : formData.projectTitle} 
-              onValueChange={(value) => handleSelectChange("projectTitle", value)}
-            >
-              <SelectTrigger className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg">
-                <SelectValue placeholder="Choisissez un projet dans la liste" />
+        <div className="grid gap-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="project">Projet</Label>
+            <Select onValueChange={handleProjectChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner un projet" />
               </SelectTrigger>
-              <SelectContent className="max-h-60">
+              <SelectContent>
                 {predefinedProjects.map((project, index) => (
-                  <SelectItem key={index} value={project} className="py-3">
+                  <SelectItem key={index} value={project}>
                     {project}
                   </SelectItem>
                 ))}
-                <SelectItem value="custom" className="font-semibold text-blue-600 py-3">
-                  ✏️ Saisir un projet personnalisé
-                </SelectItem>
+                <SelectItem value="custom">Projet personnalisé</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {formData.useCustomProject && (
+          {isCustomProject && (
             <div className="space-y-2">
-              <Label htmlFor="customProject" className="text-sm font-semibold text-gray-800">Projet personnalisé *</Label>
-              <Textarea
+              <Label htmlFor="customProject">Nom du projet personnalisé</Label>
+              <Input
                 id="customProject"
-                name="customProject"
-                value={formData.customProject}
-                onChange={handleInputChange}
-                placeholder="Décrivez le projet personnalisé..."
-                className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg min-h-20"
+                value={customProject}
+                onChange={(e) => setCustomProject(e.target.value)}
+                placeholder="Entrez le nom du projet"
+                className="border-2 border-gray-200 focus:border-blue-500"
               />
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate" className="text-sm font-semibold text-gray-800">Date de début</Label>
-              <Input
-                id="startDate"
-                name="startDate"
-                type="date"
-                value={formData.startDate}
-                onChange={handleInputChange}
-                className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate" className="text-sm font-semibold text-gray-800">Date de fin</Label>
-              <Input
-                id="endDate"
-                name="endDate"
-                type="date"
-                value={formData.endDate}
-                onChange={handleInputChange}
-                className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
-              />
-            </div>
-          </div>
-
           <div className="space-y-2">
-            <Label htmlFor="status" className="text-sm font-semibold text-gray-800">Statut</Label>
-            <Select 
-              value={formData.status} 
-              onValueChange={(value) => handleSelectChange("status", value)}
-            >
-              <SelectTrigger className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg">
-                <SelectValue />
+            <Label htmlFor="intern">Stagiaire</Label>
+            <Select onValueChange={setSelectedIntern}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner un stagiaire" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en cours">En cours</SelectItem>
-                <SelectItem value="terminé">Terminé</SelectItem>
+                {availableInterns.map((intern) => (
+                  <SelectItem key={intern.id} value={intern.id}>
+                    {intern.firstName} {intern.lastName} - {intern.title}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Date de début</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border-2 border-gray-200 focus:border-blue-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endDate">Date de fin</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border-2 border-gray-200 focus:border-blue-500"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4 border-t">
-          <Button variant="outline" onClick={handleCancel} className="px-6">
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
-          <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 px-6">
-            Enregistrer
+          <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
+            Assigner
           </Button>
         </div>
       </DialogContent>

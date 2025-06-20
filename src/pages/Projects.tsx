@@ -25,7 +25,7 @@ const Projects = () => {
   }, [refetch]);
 
   const calculateProgress = (tasks: any[]) => {
-    if (tasks.length === 0) return 0;
+    if (!tasks || tasks.length === 0) return 0;
     const completedCount = tasks.filter(task => task.status === "completed").length;
     return Math.round((completedCount / tasks.length) * 100);
   };
@@ -43,6 +43,17 @@ const Projects = () => {
       default: return "bg-gray-300";
     }
   };
+
+  // Filtrer les projets en cours et terminés
+  const ongoingProjects = projects.filter(p => {
+    if (!p.interns || p.interns.length === 0) return false;
+    return p.interns.some(i => i.status === "en cours");
+  });
+
+  const completedProjects = projects.filter(p => {
+    if (!p.interns || p.interns.length === 0) return false;
+    return p.interns.some(i => i.status === "terminé");
+  });
 
   if (loading) {
     return (
@@ -82,27 +93,39 @@ const Projects = () => {
         <Tabs defaultValue="ongoing" className="w-full">
           <TabsList className="mb-6 bg-blue-50 p-1 rounded-xl">
             <TabsTrigger value="ongoing" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
-              En cours ({projects.filter(p => p.interns.some(i => i.status === "en cours")).length})
+              En cours ({ongoingProjects.length})
             </TabsTrigger>
             <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
-              Terminés ({projects.filter(p => p.interns.some(i => i.status === "terminé")).length})
+              Terminés ({completedProjects.length})
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="ongoing">
-            <ProjectsList 
-              projects={projects.filter(p => p.interns.some(i => i.status === "en cours"))} 
-              calculateProgress={calculateProgress}
-              onViewDetails={handleViewDetails}
-            />
+            {ongoingProjects.length > 0 ? (
+              <ProjectsList 
+                projects={ongoingProjects} 
+                calculateProgress={calculateProgress}
+                onViewDetails={handleViewDetails}
+              />
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500">Aucun projet en cours</p>
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="completed">
-            <ProjectsList 
-              projects={projects.filter(p => p.interns.some(i => i.status === "terminé"))} 
-              calculateProgress={calculateProgress}
-              onViewDetails={handleViewDetails}
-            />
+            {completedProjects.length > 0 ? (
+              <ProjectsList 
+                projects={completedProjects} 
+                calculateProgress={calculateProgress}
+                onViewDetails={handleViewDetails}
+              />
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500">Aucun projet terminé</p>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
@@ -119,6 +142,10 @@ const Projects = () => {
         onOpenChange={setIsAssignDialogOpen}
         projects={projects}
         interns={interns}
+        onAssignmentSuccess={() => {
+          refetch();
+          setIsAssignDialogOpen(false);
+        }}
       />
     </MainLayout>
   );

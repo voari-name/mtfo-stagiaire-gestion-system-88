@@ -67,7 +67,7 @@ const AttestationCard = ({ intern, project, evaluation }: AttestationCardProps) 
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
             >
               <Edit className="w-4 h-4 mr-2" />
-              Créer l'attestation
+              Créer l'évaluation
             </Button>
           </div>
         </CardContent>

@@ -22,6 +22,9 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
 }) => {
   if (!project) return null;
 
+  const safeInterns = project.interns || [];
+  const safeTasks = project.tasks || [];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px]">
@@ -41,59 +44,67 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({
           </div>
 
           <div>
-            <h3 className="font-semibold mb-3">Liste des stagiaires</h3>
-            <div className="space-y-4">
-              {project.interns.map((intern) => (
-                <div key={intern.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 rounded-full bg-blue-800 flex items-center justify-center text-white font-semibold mr-3">
-                      {intern.name.split(' ').map((n) => n[0]).join('')}
-                    </div>
-                    <div>
-                      <h4 className="font-medium">{intern.name}</h4>
-                      <div className="flex items-center">
-                        <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
-                          <div 
-                            className="h-full bg-blue-600 rounded-full" 
-                            style={{ width: `${intern.completion}%` }}
-                          ></div>
+            <h3 className="font-semibold mb-3">Liste des stagiaires ({safeInterns.length})</h3>
+            {safeInterns.length > 0 ? (
+              <div className="space-y-4">
+                {safeInterns.map((intern, index) => (
+                  <div key={intern.id || index} className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-blue-800 flex items-center justify-center text-white font-semibold mr-3">
+                        {intern.name ? intern.name.split(' ').map((n) => n[0]).join('') : 'N/A'}
+                      </div>
+                      <div>
+                        <h4 className="font-medium">{intern.name || 'Nom non disponible'}</h4>
+                        <div className="flex items-center">
+                          <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden mr-2">
+                            <div 
+                              className="h-full bg-blue-600 rounded-full" 
+                              style={{ width: `${intern.completion || 0}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs">{intern.completion || 0}% complété</span>
                         </div>
-                        <span className="text-xs">{intern.completion}% complété</span>
                       </div>
                     </div>
+                    <Badge variant="outline" className={
+                      intern.status === 'terminé' ? 'border-green-500 text-green-700 bg-green-50' : 
+                      intern.status === 'en cours' ? 'border-blue-500 text-blue-700 bg-blue-50' : 
+                      'border-amber-500 text-amber-700 bg-amber-50'
+                    }>
+                      {intern.status === 'terminé' ? 'Terminé' : 
+                       intern.status === 'en cours' ? 'En cours' : 'À commencer'}
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className={
-                    intern.status === 'fin' ? 'border-green-500 text-green-700 bg-green-50' : 
-                    intern.status === 'en cours' ? 'border-blue-500 text-blue-700 bg-blue-50' : 
-                    'border-amber-500 text-amber-700 bg-amber-50'
-                  }>
-                    {intern.status === 'fin' ? 'Terminé' : 
-                     intern.status === 'en cours' ? 'En cours' : 'À commencer'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-4">Aucun stagiaire assigné</p>
+            )}
           </div>
 
           <div>
-            <h3 className="font-semibold mb-3">Gestion des tâches</h3>
-            <div className="space-y-2">
-              {project.tasks.map((task) => (
-                <div key={task.id} className="flex items-center justify-between border-b pb-2">
-                  <div className="flex items-center">
-                    <div className={`h-3 w-3 rounded-full mr-3 ${getStatusColor(task.status as TaskStatus)}`}></div>
-                    <span>{task.name}</span>
+            <h3 className="font-semibold mb-3">Gestion des tâches ({safeTasks.length})</h3>
+            {safeTasks.length > 0 ? (
+              <div className="space-y-2">
+                {safeTasks.map((task, index) => (
+                  <div key={task.id || index} className="flex items-center justify-between border-b pb-2">
+                    <div className="flex items-center">
+                      <div className={`h-3 w-3 rounded-full mr-3 ${getStatusColor(task.status as TaskStatus)}`}></div>
+                      <span>{task.name || 'Tâche sans nom'}</span>
+                    </div>
+                    <Badge variant={
+                      task.status === 'completed' ? 'default' : 
+                      task.status === 'in-progress' ? 'secondary' : 'outline'
+                    }>
+                      {task.status === 'completed' ? 'Terminé' : 
+                       task.status === 'in-progress' ? 'En cours' : 'À faire'}
+                    </Badge>
                   </div>
-                  <Badge variant={
-                    task.status === 'completed' ? 'default' : 
-                    task.status === 'in-progress' ? 'secondary' : 'outline'
-                  }>
-                    {task.status === 'completed' ? 'Terminé' : 
-                     task.status === 'in-progress' ? 'En cours' : 'À faire'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-4">Aucune tâche définie</p>
+            )}
           </div>
 
           <div className="pt-4 flex justify-end space-x-2">
