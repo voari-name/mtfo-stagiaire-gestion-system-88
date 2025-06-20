@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { Search, UserPlus, Edit, Trash2 } from "lucide-react";
 import { useInternsData } from "@/hooks/useInternsData";
 
 const Internships = () => {
-  const { interns, loading, addIntern, deleteIntern } = useInternsData();
+  const { interns, loading, addIntern, deleteIntern, refetch } = useInternsData();
   const [formData, setFormData] = useState({
     photo: "",
     lastName: "",
@@ -21,12 +21,20 @@ const Internships = () => {
     email: "",
     gender: "",
     school: "",
-    status: "en cours"
+    status: "En cours"
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingIntern, setEditingIntern] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // Rafraîchir automatiquement la liste
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,7 +62,7 @@ const Internships = () => {
       await addIntern({
         firstName: formData.firstName,
         lastName: formData.lastName,
-        title: "", 
+        title: formData.school, 
         email: formData.email,
         startDate: new Date().toISOString().split('T')[0],
         endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -68,10 +76,11 @@ const Internships = () => {
         email: "",
         gender: "",
         school: "",
-        status: "en cours"
+        status: "En cours"
       });
       
       setIsDialogOpen(false);
+      refetch(); // Rafraîchir immédiatement après ajout
     } catch (error) {
       // Error handling is done in the hook
     }
@@ -85,7 +94,7 @@ const Internships = () => {
       firstName: intern.firstName,
       email: intern.email,
       gender: intern.gender || "",
-      school: intern.school || "",
+      school: intern.title || "",
       status: intern.status
     });
     setIsEditDialogOpen(true);
@@ -94,6 +103,7 @@ const Internships = () => {
   const handleDeleteIntern = async (internId: string) => {
     try {
       await deleteIntern(internId);
+      refetch(); // Rafraîchir immédiatement après suppression
     } catch (error) {
       // Error handling is done in the hook
     }
@@ -208,8 +218,8 @@ const Internships = () => {
             <SelectValue placeholder="Sélectionnez un statut" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="en cours">En cours</SelectItem>
-            <SelectItem value="terminé">Terminé</SelectItem>
+            <SelectItem value="En cours">En cours</SelectItem>
+            <SelectItem value="Terminé">Terminé</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -238,10 +248,10 @@ const Internships = () => {
                 <p className="text-sm text-blue-600 font-medium">{intern.email}</p>
                 <div className="flex items-center space-x-2 mt-1">
                   <p className="text-xs text-gray-500 capitalize">{intern.gender || 'Non spécifié'}</p>
-                  {intern.school && (
+                  {intern.title && (
                     <>
                       <span className="text-gray-300">•</span>
-                      <p className="text-xs text-gray-600 font-medium">{intern.school}</p>
+                      <p className="text-xs text-gray-600 font-medium">{intern.title}</p>
                     </>
                   )}
                 </div>
@@ -251,12 +261,11 @@ const Internships = () => {
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <p className="text-sm text-gray-600 font-medium mb-2">Statut du stage</p>
               <span className={`px-4 py-2 rounded-full text-sm font-semibold inline-block ${
-                intern.status === 'en cours' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                intern.status === 'terminé' ? 'bg-green-100 text-green-800 border border-green-200' :
+                intern.status === 'En cours' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                intern.status === 'Terminé' ? 'bg-green-100 text-green-800 border border-green-200' :
                 'bg-amber-100 text-amber-800 border border-amber-200'
               }`}>
-                {intern.status === 'en cours' ? 'En cours' : 
-                 intern.status === 'terminé' ? 'Terminé' : 'À commencer'}
+                {intern.status}
               </span>
             </div>
           </div>
@@ -388,10 +397,10 @@ const Internships = () => {
               Tous ({filteredInterns.length})
             </TabsTrigger>
             <TabsTrigger value="ongoing" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
-              En cours ({filteredInterns.filter(intern => intern.status === 'en cours').length})
+              En cours ({filteredInterns.filter(intern => intern.status === 'En cours').length})
             </TabsTrigger>
             <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
-              Terminés ({filteredInterns.filter(intern => intern.status === 'terminé').length})
+              Terminés ({filteredInterns.filter(intern => intern.status === 'Terminé').length})
             </TabsTrigger>
           </TabsList>
           
@@ -408,13 +417,13 @@ const Internships = () => {
           </TabsContent>
           
           <TabsContent value="ongoing" className="space-y-6">
-            {filteredInterns.filter(intern => intern.status === 'en cours').map(renderInternCard)}
+            {filteredInterns.filter(intern => intern.status === 'En cours').map(renderInternCard)}
           </TabsContent>
           
           <TabsContent value="completed">
-            {filteredInterns.filter(intern => intern.status === 'terminé').length > 0 ? (
+            {filteredInterns.filter(intern => intern.status === 'Terminé').length > 0 ? (
               <div className="grid gap-6">
-                {filteredInterns.filter(intern => intern.status === 'terminé').map(renderInternCard)}
+                {filteredInterns.filter(intern => intern.status === 'Terminé').map(renderInternCard)}
               </div>
             ) : (
               <div className="text-center py-12 bg-gray-50 rounded-lg">

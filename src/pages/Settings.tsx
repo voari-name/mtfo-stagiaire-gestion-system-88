@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -20,6 +20,45 @@ const Settings = () => {
     setLanguage,
     translations 
   } = useSettings();
+
+  useEffect(() => {
+    if (standbyMode) {
+      // Activer le mode veille après 5 secondes d'inactivité pour la démonstration
+      let standbyTimer: NodeJS.Timeout;
+      
+      const resetTimer = () => {
+        clearTimeout(standbyTimer);
+        document.body.style.filter = 'none';
+        document.body.style.opacity = '1';
+        
+        standbyTimer = setTimeout(() => {
+          document.body.style.filter = 'blur(2px) brightness(0.3)';
+          document.body.style.opacity = '0.7';
+          document.body.style.transition = 'all 0.5s ease';
+        }, 5000);
+      };
+
+      const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+      
+      events.forEach(event => {
+        document.addEventListener(event, resetTimer, true);
+      });
+
+      resetTimer();
+
+      return () => {
+        clearTimeout(standbyTimer);
+        events.forEach(event => {
+          document.removeEventListener(event, resetTimer, true);
+        });
+        document.body.style.filter = 'none';
+        document.body.style.opacity = '1';
+      };
+    } else {
+      document.body.style.filter = 'none';
+      document.body.style.opacity = '1';
+    }
+  }, [standbyMode]);
 
   const languages = [
     { value: "fr", label: "Français" },
@@ -54,6 +93,11 @@ const Settings = () => {
                     onCheckedChange={setStandbyMode}
                   />
                 </div>
+                {standbyMode && (
+                  <div className="text-sm text-muted-foreground bg-blue-50 p-3 rounded-lg">
+                    Mode veille activé : l'écran se mettra en veille après 5 secondes d'inactivité
+                  </div>
+                )}
               </div>
               
               <div className="space-y-6">

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,11 +10,19 @@ import { useProjectsData } from "@/hooks/useProjectsData";
 import { useInternsData } from "@/hooks/useInternsData";
 
 const Projects = () => {
-  const { projects, loading } = useProjectsData();
+  const { projects, loading, refetch } = useProjectsData();
   const { interns } = useInternsData();
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+
+  // Rafraîchir automatiquement la liste des projets
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   const calculateProgress = (tasks: any[]) => {
     if (tasks.length === 0) return 0;
