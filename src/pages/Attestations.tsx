@@ -18,6 +18,10 @@ const Attestations = () => {
     intern.status === 'terminé' && intern.completion >= 80
   );
 
+  // Calculer les statistiques nécessaires
+  const activeInternsCount = interns.filter(intern => intern.status === 'en cours').length;
+  const evaluationsCount = eligibleInterns.length;
+
   // Créer des données fictives d'évaluation pour la démonstration
   const internsWithEvaluations = eligibleInterns.map(intern => {
     // Trouver le projet associé au stagiaire
@@ -52,7 +56,7 @@ const Attestations = () => {
   return (
     <MainLayout title="Attestations" currentPage="evaluations">
       <div className="space-y-6">
-        <AttestationsHeader />
+        <AttestationsHeader eligibleInternsCount={eligibleInterns.length} />
         
         {internsWithEvaluations.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -66,7 +70,10 @@ const Attestations = () => {
             ))}
           </div>
         ) : (
-          <EmptyAttestationsState />
+          <EmptyAttestationsState 
+            activeInternsCount={activeInternsCount}
+            evaluationsCount={evaluationsCount}
+          />
         )}
       </div>
     </MainLayout>
