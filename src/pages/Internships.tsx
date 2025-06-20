@@ -20,9 +20,8 @@ const Internships = () => {
     firstName: "",
     email: "",
     gender: "",
-    startDate: "",
-    endDate: "",
-    status: "début"
+    school: "",
+    status: "en cours"
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,8 +56,8 @@ const Internships = () => {
         lastName: formData.lastName,
         title: "", 
         email: formData.email,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         status: formData.status
       });
       
@@ -68,9 +67,8 @@ const Internships = () => {
         firstName: "",
         email: "",
         gender: "",
-        startDate: "",
-        endDate: "",
-        status: "début"
+        school: "",
+        status: "en cours"
       });
       
       setIsDialogOpen(false);
@@ -87,8 +85,7 @@ const Internships = () => {
       firstName: intern.firstName,
       email: intern.email,
       gender: intern.gender || "",
-      startDate: intern.startDate,
-      endDate: intern.endDate,
+      school: intern.school || "",
       status: intern.status
     });
     setIsEditDialogOpen(true);
@@ -111,107 +108,106 @@ const Internships = () => {
   const InternForm = ({ isEdit = false }) => (
     <div className="grid gap-6 py-4">
       <div className="space-y-3">
-        <Label htmlFor="photo" className="text-sm font-medium text-gray-700">Photo du stagiaire</Label>
-        <Input 
-          id="photo" 
-          name="photo" 
-          type="file" 
-          accept="image/*"
-          onChange={handlePhotoChange}
-          className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
+        <Label htmlFor="photo" className="text-sm font-semibold text-gray-800">Photo du stagiaire</Label>
+        <div className="relative">
+          {formData.photo && (
+            <div className="mb-4 flex justify-center">
+              <img 
+                src={formData.photo} 
+                alt="Preview" 
+                className="w-24 h-24 rounded-full object-cover border-4 border-blue-100 shadow-lg"
+              />
+            </div>
+          )}
+          <Input 
+            id="photo" 
+            name="photo" 
+            type="file" 
+            accept="image/*"
+            onChange={handlePhotoChange}
+            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all duration-200"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-3">
-          <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">Nom</Label>
+          <Label htmlFor="lastName" className="text-sm font-semibold text-gray-800">Nom *</Label>
           <Input 
             id="lastName" 
             name="lastName" 
             value={formData.lastName} 
             onChange={handleInputChange}
-            className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200"
             placeholder="Entrez le nom"
           />
         </div>
         <div className="space-y-3">
-          <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">Prénom</Label>
+          <Label htmlFor="firstName" className="text-sm font-semibold text-gray-800">Prénom *</Label>
           <Input 
             id="firstName" 
             name="firstName" 
             value={formData.firstName} 
             onChange={handleInputChange}
-            className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200"
             placeholder="Entrez le prénom"
           />
         </div>
       </div>
 
       <div className="space-y-3">
-        <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+        <Label htmlFor="email" className="text-sm font-semibold text-gray-800">Email *</Label>
         <Input 
           id="email" 
           name="email" 
           type="email" 
           value={formData.email} 
           onChange={handleInputChange}
-          className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200"
           placeholder="exemple@email.com"
         />
       </div>
 
-      <div className="space-y-3">
-        <Label htmlFor="gender" className="text-sm font-medium text-gray-700">Sexe</Label>
-        <Select 
-          value={formData.gender} 
-          onValueChange={(value) => handleSelectChange("gender", value)}
-        >
-          <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <SelectValue placeholder="Sélectionnez le sexe" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="masculin">Masculin</SelectItem>
-            <SelectItem value="feminin">Féminin</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-3">
-          <Label htmlFor="startDate" className="text-sm font-medium text-gray-700">Date de début</Label>
-          <Input 
-            id="startDate" 
-            name="startDate" 
-            type="date" 
-            value={formData.startDate} 
-            onChange={handleInputChange}
-            className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+          <Label htmlFor="gender" className="text-sm font-semibold text-gray-800">Sexe</Label>
+          <Select 
+            value={formData.gender} 
+            onValueChange={(value) => handleSelectChange("gender", value)}
+          >
+            <SelectTrigger className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg">
+              <SelectValue placeholder="Sélectionnez le sexe" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="masculin">Masculin</SelectItem>
+              <SelectItem value="feminin">Féminin</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+        
         <div className="space-y-3">
-          <Label htmlFor="endDate" className="text-sm font-medium text-gray-700">Date de fin</Label>
+          <Label htmlFor="school" className="text-sm font-semibold text-gray-800">École</Label>
           <Input 
-            id="endDate" 
-            name="endDate" 
-            type="date" 
-            value={formData.endDate} 
+            id="school" 
+            name="school" 
+            value={formData.school} 
             onChange={handleInputChange}
-            className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200"
+            placeholder="Nom de l'école"
           />
         </div>
       </div>
 
       <div className="space-y-3">
-        <Label htmlFor="status" className="text-sm font-medium text-gray-700">Statut</Label>
+        <Label htmlFor="status" className="text-sm font-semibold text-gray-800">Statut</Label>
         <Select 
           value={formData.status} 
           onValueChange={(value) => handleSelectChange("status", value)}
         >
-          <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <SelectTrigger className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg">
             <SelectValue placeholder="Sélectionnez un statut" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="début">Début</SelectItem>
             <SelectItem value="en cours">En cours</SelectItem>
             <SelectItem value="terminé">Terminé</SelectItem>
           </SelectContent>
@@ -221,41 +217,47 @@ const Internships = () => {
   );
 
   const renderInternCard = (intern: any) => (
-    <Card key={intern.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105">
+    <Card key={intern.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-102 border-0 shadow-lg bg-gradient-to-br from-white to-blue-50">
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row">
           <div className="p-6 flex-1">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                {intern.firstName.charAt(0)}{intern.lastName.charAt(0)}
-              </div>
+            <div className="flex items-center space-x-4 mb-6">
+              {intern.photo ? (
+                <img 
+                  src={intern.photo} 
+                  alt={`${intern.firstName} ${intern.lastName}`}
+                  className="h-16 w-16 rounded-full object-cover border-4 border-blue-200 shadow-md"
+                />
+              ) : (
+                <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                  {intern.firstName.charAt(0)}{intern.lastName.charAt(0)}
+                </div>
+              )}
               <div>
                 <h3 className="font-bold text-xl text-gray-800">{intern.firstName} {intern.lastName}</h3>
-                <p className="text-sm text-gray-600">{intern.email}</p>
-                <p className="text-xs text-gray-500 capitalize">{intern.gender || 'Non spécifié'}</p>
+                <p className="text-sm text-blue-600 font-medium">{intern.email}</p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <p className="text-xs text-gray-500 capitalize">{intern.gender || 'Non spécifié'}</p>
+                  {intern.school && (
+                    <>
+                      <span className="text-gray-300">•</span>
+                      <p className="text-xs text-gray-600 font-medium">{intern.school}</p>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm text-gray-600 font-medium">Période de stage</p>
-                <p className="font-semibold text-gray-800">
-                  {new Date(intern.startDate).toLocaleDateString('fr-FR')} 
-                  <span className="text-gray-500 mx-2">→</span>
-                  {new Date(intern.endDate).toLocaleDateString('fr-FR')}
-                </p>
-              </div>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm text-gray-600 font-medium">Statut</p>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium inline-block ${
-                  intern.status === 'en cours' ? 'bg-blue-100 text-blue-800' :
-                  intern.status === 'terminé' ? 'bg-green-100 text-green-800' :
-                  'bg-amber-100 text-amber-800'
-                }`}>
-                  {intern.status === 'en cours' ? 'En cours' : 
-                   intern.status === 'terminé' ? 'Terminé' : 'À commencer'}
-                </span>
-              </div>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <p className="text-sm text-gray-600 font-medium mb-2">Statut du stage</p>
+              <span className={`px-4 py-2 rounded-full text-sm font-semibold inline-block ${
+                intern.status === 'en cours' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                intern.status === 'terminé' ? 'bg-green-100 text-green-800 border border-green-200' :
+                'bg-amber-100 text-amber-800 border border-amber-200'
+              }`}>
+                {intern.status === 'en cours' ? 'En cours' : 
+                 intern.status === 'terminé' ? 'Terminé' : 'À commencer'}
+              </span>
             </div>
           </div>
           
@@ -263,14 +265,14 @@ const Internships = () => {
             <Button 
               variant="outline"
               onClick={() => handleEditIntern(intern)}
-              className="border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white transition-all duration-200"
+              className="border-blue-300 text-blue-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 font-medium"
             >
               <Edit className="w-4 h-4 mr-2" />
               Modifier
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-200">
+                <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-200 font-medium">
                   <Trash2 className="w-4 h-4 mr-2" />
                   Supprimer
                 </Button>
@@ -314,7 +316,10 @@ const Internships = () => {
     <MainLayout title="Stagiaires" currentPage="internships">
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="text-3xl font-bold text-gray-800">Gestion des Stagiaires</h2>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">Gestion des Stagiaires</h2>
+            <p className="text-gray-600 mt-2">Gérez vos stagiaires et suivez leur progression</p>
+          </div>
           
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <div className="relative">
@@ -324,7 +329,7 @@ const Internships = () => {
                 placeholder="Rechercher un stagiaire..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full sm:w-64 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="pl-10 w-full sm:w-64 border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
               />
             </div>
             
@@ -378,18 +383,15 @@ const Internships = () => {
         </Dialog>
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6 bg-blue-50">
-            <TabsTrigger value="all" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+          <TabsList className="grid w-full grid-cols-3 mb-6 bg-blue-50 p-1 rounded-xl">
+            <TabsTrigger value="all" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
               Tous ({filteredInterns.length})
             </TabsTrigger>
-            <TabsTrigger value="ongoing" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="ongoing" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
               En cours ({filteredInterns.filter(intern => intern.status === 'en cours').length})
             </TabsTrigger>
-            <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
               Terminés ({filteredInterns.filter(intern => intern.status === 'terminé').length})
-            </TabsTrigger>
-            <TabsTrigger value="starting" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              À commencer ({filteredInterns.filter(intern => intern.status === 'début').length})
             </TabsTrigger>
           </TabsList>
           
@@ -417,18 +419,6 @@ const Internships = () => {
             ) : (
               <div className="text-center py-12 bg-gray-50 rounded-lg">
                 <p className="text-gray-500 text-lg">Aucun stage terminé pour le moment</p>
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="starting">
-            {filteredInterns.filter(intern => intern.status === 'début').length > 0 ? (
-              <div className="grid gap-6">
-                {filteredInterns.filter(intern => intern.status === 'début').map(renderInternCard)}
-              </div>
-            ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <p className="text-gray-500 text-lg">Aucun stage à commencer pour le moment</p>
               </div>
             )}
           </TabsContent>
