@@ -122,8 +122,8 @@ const Attestations = () => {
     }
     
     // Ajout de l'évaluation
-    const evaluation = evaluations.find(eval => 
-      eval.firstName === intern.firstName && eval.lastName === intern.lastName
+    const evaluation = evaluations.find(evaluation => 
+      evaluation.firstName === intern.firstName && evaluation.lastName === intern.lastName
     );
     
     if (evaluation) {
@@ -184,8 +184,8 @@ const Attestations = () => {
                 )
               );
 
-              const evaluation = evaluations.find(eval => 
-                eval.firstName === intern.firstName && eval.lastName === intern.lastName
+              const evaluation = evaluations.find(evaluation => 
+                evaluation.firstName === intern.firstName && evaluation.lastName === intern.lastName
               );
 
               return (
