@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Internships from "./pages/Internships";
 import Projects from "./pages/Projects";
 import Attestations from "./pages/Attestations";
+import StageEvaluation from "./pages/StageEvaluation";
 import Statistics from "./pages/Statistics";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/internships" element={<Internships />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/evaluations" element={<Attestations />} />
+            <Route path="/stage-evaluation" element={<StageEvaluation />} />
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />

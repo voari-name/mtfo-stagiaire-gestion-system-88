@@ -1,4 +1,3 @@
-
 import jsPDF from 'jspdf';
 
 export interface AttestationData {
@@ -10,6 +9,13 @@ export interface AttestationData {
   endDate?: string;
   projectTitle?: string;
   grade?: number;
+  tutorName?: string;
+  evaluation?: {
+    presence: string;
+    technicalSkills: string;
+    behavior: string;
+    comment: string;
+  };
 }
 
 export const generateAttestationPDF = (intern: AttestationData) => {
@@ -17,40 +23,39 @@ export const generateAttestationPDF = (intern: AttestationData) => {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
-  let yPosition = 30;
+  let yPosition = 20;
 
-  // En-tête avec logos
+  // En-tête République de Madagascar
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.text('REPOBLIKAN\'I MADAGASIKARA', pageWidth / 2, 15, { align: 'center' });
-  doc.text('Fitiavana - Tanindrazana - Fandrosoana', pageWidth / 2, 25, { align: 'center' });
+  doc.text('RÉPUBLIQUE DE MADAGASCAR', pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 8;
+  doc.text('Fitiavana - Tanindrazana - Fandrosoana', pageWidth / 2, yPosition, { align: 'center' });
   
-  // Logo placeholder (vous pouvez ajouter une vraie image ici)
+  // Logo placeholders - À remplacer par de vraies images si disponibles
+  yPosition += 15;
   doc.setFontSize(8);
-  doc.text('🇲🇬', pageWidth / 2 - 10, 35, { align: 'center' });
+  doc.text('🇲🇬', pageWidth / 2, yPosition, { align: 'center' });
+  doc.text('LOGO MTEFoP', pageWidth - 30, 20);
   
-  yPosition = 50;
+  yPosition += 20;
   
+  // Ministère
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('MINISTERE DU TRAVAIL, DE L\'EMPLOI', pageWidth / 2, yPosition, { align: 'center' });
-  yPosition += 10;
-  doc.text('ET DE LA FONCTION PUBLIQUE', pageWidth / 2, yPosition, { align: 'center' });
+  doc.text('MINISTÈRE DU TRAVAIL, DE L\'EMPLOI ET DE LA FONCTION PUBLIQUE', pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 8;
+  
+  doc.text('SECRÉTARIAT GÉNÉRAL', pageWidth / 2, yPosition, { align: 'center' });
+  yPosition += 8;
+  
+  doc.text('DIRECTION DU SYSTÈME D\'INFORMATION', pageWidth / 2, yPosition, { align: 'center' });
   
   yPosition += 20;
-  doc.line(margin, yPosition, pageWidth - margin, yPosition);
   
-  yPosition += 15;
-  doc.text('SECRETARIAT GENERAL', pageWidth / 2, yPosition, { align: 'center' });
-  
-  yPosition += 15;
-  doc.line(margin, yPosition, pageWidth - margin, yPosition);
-  
-  yPosition += 15;
-  doc.text('DIRECTION DU SYSTEME D\'INFORMATION', pageWidth / 2, yPosition, { align: 'center' });
-  
-  yPosition += 20;
-  doc.text(`N°............. ${new Date().getFullYear()}/MTeFoP/SG/DSI`, pageWidth / 2, yPosition, { align: 'center' });
+  // Numéro
+  doc.setFontSize(10);
+  doc.text(`N° …… /${new Date().getFullYear()}/MTEFoP/SG/DSI`, pageWidth / 2, yPosition, { align: 'center' });
   
   yPosition += 30;
   
@@ -65,47 +70,91 @@ export const generateAttestationPDF = (intern: AttestationData) => {
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   
-  const introText = `Nous soussigné, la Direction du Système d'Information du Ministère du Travail de l'Emploi et de la Fonction Publique, certifie que :`;
+  const introText = `Nous, soussignés, la Direction du Système d'Information du Ministère du Travail, de l'Emploi et de la Fonction Publique, certifions que :`;
   doc.text(introText, margin, yPosition, { maxWidth: pageWidth - 2 * margin });
-  
-  yPosition += 25;
-  
-  // Nom du stagiaire
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text(`${intern.firstName} ${intern.lastName}`, pageWidth / 2, yPosition, { align: 'center' });
-  
-  yPosition += 25;
-  
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(12);
-  
-  const stageText = `a effectué avec succès un stage au sein de notre Direction, Service d'Appui à l'Informatisation de l'Administration,`;
-  doc.text(stageText, margin, yPosition, { maxWidth: pageWidth - 2 * margin });
   
   yPosition += 20;
   
-  if (intern.projectTitle) {
-    const projectText = `dans le cadre du projet "${intern.projectTitle}".`;
-    doc.text(projectText, margin, yPosition, { maxWidth: pageWidth - 2 * margin });
+  // Informations du stagiaire
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  const gender = Math.random() > 0.5 ? 'Mr' : 'Mme'; // Placeholder - à adapter selon les données
+  const studentInfo = `${gender} ${intern.firstName} ${intern.lastName},`;
+  doc.text(studentInfo, margin, yPosition);
+  
+  yPosition += 12;
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  const studentText = `étudiant(e) à ${intern.student || '[ÉCOLE]'},`;
+  doc.text(studentText, margin, yPosition);
+  
+  yPosition += 12;
+  
+  const stageText = `a effectué un stage au sein de notre Direction, Service d'Appui à l'Informatisation de l'Administration,`;
+  doc.text(stageText, margin, yPosition, { maxWidth: pageWidth - 2 * margin });
+  
+  yPosition += 12;
+  
+  // Période
+  if (intern.startDate && intern.endDate) {
+    const periodText = `durant la période du ${new Date(intern.startDate).toLocaleDateString('fr-FR')} au ${new Date(intern.endDate).toLocaleDateString('fr-FR')}.`;
+    doc.text(periodText, margin, yPosition);
     yPosition += 20;
   }
   
+  // Note si disponible
   if (intern.grade) {
     yPosition += 10;
-    const evaluationText = `Le stagiaire a obtenu la note de ${intern.grade}/20 lors de son évaluation finale.`;
-    doc.text(evaluationText, margin, yPosition, { maxWidth: pageWidth - 2 * margin });
+    const gradeText = `Le stagiaire a obtenu la note de ${intern.grade}/20 lors de son évaluation finale.`;
+    doc.text(gradeText, margin, yPosition, { maxWidth: pageWidth - 2 * margin });
     yPosition += 15;
   }
   
-  yPosition += 10;
-  const validationText = `La présente attestation lui est délivrée pour servir et valoir ce que de droit.`;
-  doc.text(validationText, margin, yPosition, { maxWidth: pageWidth - 2 * margin });
+  // Détails de l'évaluation si disponibles
+  if (intern.evaluation) {
+    yPosition += 10;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Détail de l\'évaluation :', margin, yPosition);
+    yPosition += 10;
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    const evaluationDetails = [
+      `• Présence : ${intern.evaluation.presence}`,
+      `• Compétences techniques : ${intern.evaluation.technicalSkills}`,
+      `• Comportement : ${intern.evaluation.behavior}`
+    ];
+    
+    evaluationDetails.forEach(detail => {
+      doc.text(detail, margin + 5, yPosition);
+      yPosition += 6;
+    });
+    
+    yPosition += 10;
+  }
   
-  // Signature et date
+  yPosition += 15;
+  
+  // Conclusion
+  doc.setFontSize(12);
+  const conclusionText = `La présente attestation lui est délivrée pour servir et valoir ce que de droit.`;
+  doc.text(conclusionText, margin, yPosition, { maxWidth: pageWidth - 2 * margin });
+  
+  // Signatures en bas
   yPosition = pageHeight - 80;
-  doc.text('Le Directeur du Système d\'Information', margin + 50, yPosition);
-  doc.text(`Antananarivo, le ${new Date().toLocaleDateString('fr-FR')}`, pageWidth - margin - 80, yPosition);
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  
+  if (intern.tutorName) {
+    doc.text(`Encadreur : ${intern.tutorName}`, margin, yPosition);
+  }
+  
+  doc.text(`Fait à Antananarivo, le ${new Date().toLocaleDateString('fr-FR')}`, pageWidth - margin - 80, yPosition);
+  
+  yPosition += 20;
+  doc.text('[Signature + Cachet]', pageWidth - margin - 80, yPosition);
   
   // Télécharger le PDF
   const fileName = `attestation_stage_${intern.firstName}_${intern.lastName}_${new Date().getFullYear()}.pdf`;
