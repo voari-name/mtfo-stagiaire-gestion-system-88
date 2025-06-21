@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, UserPlus, Edit, Trash2 } from "lucide-react";
 import { useInternsData } from "@/hooks/useInternsData";
+import { InternData } from "@/types/intern";
 
 const Internships = () => {
   const { interns, loading, addIntern, updateIntern, deleteIntern, refetch } = useInternsData();
@@ -24,7 +25,7 @@ const Internships = () => {
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingIntern, setEditingIntern] = useState<any>(null);
+  const [editingIntern, setEditingIntern] = useState<InternData | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Rafraîchir automatiquement la liste
@@ -91,7 +92,7 @@ const Internships = () => {
     }
   };
 
-  const handleEditIntern = (intern: any) => {
+  const handleEditIntern = (intern: InternData) => {
     setEditingIntern(intern);
     setFormData({
       photo: intern.photo || "",

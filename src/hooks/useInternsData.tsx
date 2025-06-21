@@ -1,21 +1,13 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-export interface InternData {
-  id: string;
-  firstName: string;
-  lastName: string;
-  title: string;
-  email: string;
-  startDate: string;
-  endDate: string;
-  status: string;
-  completion?: number;
-  photo?: string;
-  gender?: string;
-}
+import { InternData, CreateInternData, UpdateInternData } from "@/types/intern";
+import { 
+  fetchInternsFromDb, 
+  createInternInDb, 
+  updateInternInDb, 
+  deleteInternFromDb 
+} from "@/services/internService";
 
 export const useInternsData = () => {
   const [interns, setInterns] = useState<InternData[]>([]);
@@ -24,28 +16,8 @@ export const useInternsData = () => {
 
   const fetchInterns = async () => {
     try {
-      const { data, error } = await supabase
-        .from('interns')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      const formattedInterns = data?.map(intern => ({
-        id: intern.id,
-        firstName: intern.first_name,
-        lastName: intern.last_name,
-        title: intern.title,
-        email: intern.email,
-        startDate: intern.start_date,
-        endDate: intern.end_date,
-        status: intern.status,
-        completion: intern.completion || 0,
-        photo: intern.photo || '',
-        gender: intern.gender || ''
-      })) || [];
-
-      setInterns(formattedInterns);
+      const internsData = await fetchInternsFromDb();
+      setInterns(internsData);
     } catch (error) {
       console.error('Error fetching interns:', error);
       toast({
@@ -58,41 +30,9 @@ export const useInternsData = () => {
     }
   };
 
-  const addIntern = async (internData: Omit<InternData, 'id'>) => {
+  const addIntern = async (internData: CreateInternData) => {
     try {
-      const { data, error } = await supabase
-        .from('interns')
-        .insert([{
-          first_name: internData.firstName,
-          last_name: internData.lastName,
-          title: internData.title,
-          email: internData.email,
-          start_date: internData.startDate,
-          end_date: internData.endDate,
-          status: internData.status,
-          completion: internData.completion || 0,
-          photo: internData.photo || '',
-          gender: internData.gender || ''
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      const newIntern: InternData = {
-        id: data.id,
-        firstName: data.first_name,
-        lastName: data.last_name,
-        title: data.title,
-        email: data.email,
-        startDate: data.start_date,
-        endDate: data.end_date,
-        status: data.status,
-        completion: data.completion || 0,
-        photo: data.photo || '',
-        gender: data.gender || ''
-      };
-
+      const newIntern = await createInternInDb(internData);
       setInterns(prev => [newIntern, ...prev]);
       
       toast({
@@ -112,42 +52,12 @@ export const useInternsData = () => {
     }
   };
 
-  const updateIntern = async (internId: string, internData: Partial<InternData>) => {
+  const updateIntern = async (internId: string, internData: UpdateInternData) => {
     try {
-      const { data, error } = await supabase
-        .from('interns')
-        .update({
-          first_name: internData.firstName,
-          last_name: internData.lastName,
-          title: internData.title,
-          email: internData.email,
-          start_date: internData.startDate,
-          end_date: internData.endDate,
-          status: internData.status,
-          completion: internData.completion,
-          photo: internData.photo || '',
-          gender: internData.gender || ''
-        })
-        .eq('id', internId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
+      const updatedIntern = await updateInternInDb(internId, internData);
+      
       setInterns(prev => prev.map(intern => 
-        intern.id === internId ? {
-          id: data.id,
-          firstName: data.first_name,
-          lastName: data.last_name,
-          title: data.title,
-          email: data.email,
-          startDate: data.start_date,
-          endDate: data.end_date,
-          status: data.status,
-          completion: data.completion || 0,
-          photo: data.photo || '',
-          gender: data.gender || ''
-        } : intern
+        intern.id === internId ? updatedIntern : intern
       ));
       
       toast({
@@ -155,7 +65,7 @@ export const useInternsData = () => {
         description: `${internData.firstName} ${internData.lastName} a été modifié avec succès.`,
       });
 
-      return data;
+      return updatedIntern;
     } catch (error) {
       console.error('Error updating intern:', error);
       toast({
@@ -169,13 +79,7 @@ export const useInternsData = () => {
 
   const deleteIntern = async (internId: string) => {
     try {
-      const { error } = await supabase
-        .from('interns')
-        .delete()
-        .eq('id', internId);
-
-      if (error) throw error;
-
+      await deleteInternFromDb(internId);
       setInterns(prev => prev.filter(intern => intern.id !== internId));
       
       toast({
