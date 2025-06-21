@@ -16,8 +16,10 @@ export type Database = {
           email: string
           end_date: string
           first_name: string
+          gender: string | null
           id: string
           last_name: string
+          photo: string | null
           start_date: string
           status: string
           title: string
@@ -29,8 +31,10 @@ export type Database = {
           email: string
           end_date: string
           first_name: string
+          gender?: string | null
           id?: string
           last_name: string
+          photo?: string | null
           start_date: string
           status?: string
           title: string
@@ -42,8 +46,10 @@ export type Database = {
           email?: string
           end_date?: string
           first_name?: string
+          gender?: string | null
           id?: string
           last_name?: string
+          photo?: string | null
           start_date?: string
           status?: string
           title?: string

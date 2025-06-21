@@ -41,8 +41,8 @@ export const useInternsData = () => {
         endDate: intern.end_date,
         status: intern.status,
         completion: intern.completion || 0,
-        photo: intern.photo,
-        gender: intern.gender
+        photo: intern.photo || '',
+        gender: intern.gender || ''
       })) || [];
 
       setInterns(formattedInterns);
@@ -71,8 +71,8 @@ export const useInternsData = () => {
           end_date: internData.endDate,
           status: internData.status,
           completion: internData.completion || 0,
-          photo: internData.photo,
-          gender: internData.gender
+          photo: internData.photo || '',
+          gender: internData.gender || ''
         }])
         .select()
         .single();
@@ -89,8 +89,8 @@ export const useInternsData = () => {
         endDate: data.end_date,
         status: data.status,
         completion: data.completion || 0,
-        photo: data.photo,
-        gender: data.gender
+        photo: data.photo || '',
+        gender: data.gender || ''
       };
 
       setInterns(prev => [newIntern, ...prev]);
@@ -125,8 +125,8 @@ export const useInternsData = () => {
           end_date: internData.endDate,
           status: internData.status,
           completion: internData.completion,
-          photo: internData.photo,
-          gender: internData.gender
+          photo: internData.photo || '',
+          gender: internData.gender || ''
         })
         .eq('id', internId)
         .select()
@@ -145,8 +145,8 @@ export const useInternsData = () => {
           endDate: data.end_date,
           status: data.status,
           completion: data.completion || 0,
-          photo: data.photo,
-          gender: data.gender
+          photo: data.photo || '',
+          gender: data.gender || ''
         } : intern
       ));
       
