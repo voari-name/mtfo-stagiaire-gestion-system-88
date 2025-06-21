@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useProjectsData } from "@/hooks/useProjectsData";
 
 interface AssignInternDialogProps {
   open: boolean;
@@ -42,10 +43,11 @@ const AssignInternDialog: React.FC<AssignInternDialogProps> = ({
   const [endDate, setEndDate] = useState("");
   const [isCustomProject, setIsCustomProject] = useState(false);
   const { toast } = useToast();
+  const { assignInternToProject } = useProjectsData();
 
-  const availableInterns = interns.filter(intern => intern.status === 'en cours');
+  const availableInterns = interns.filter(intern => intern.status === 'En cours');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const projectTitle = isCustomProject ? customProject : selectedProject;
     
     if (!projectTitle || !selectedIntern || !startDate || !endDate) {
@@ -60,24 +62,25 @@ const AssignInternDialog: React.FC<AssignInternDialogProps> = ({
     const selectedInternData = availableInterns.find(intern => intern.id === selectedIntern);
     
     if (selectedInternData) {
-      toast({
-        title: "Assignment réussi",
-        description: `${selectedInternData.firstName} ${selectedInternData.lastName} a été assigné au projet: ${projectTitle}`,
-      });
-      
-      // Reset form
-      setSelectedProject("");
-      setCustomProject("");
-      setSelectedIntern("");
-      setStartDate("");
-      setEndDate("");
-      setIsCustomProject(false);
-      
-      if (onAssignmentSuccess) {
-        onAssignmentSuccess();
+      try {
+        await assignInternToProject(projectTitle, selectedIntern, startDate, endDate);
+        
+        // Reset form
+        setSelectedProject("");
+        setCustomProject("");
+        setSelectedIntern("");
+        setStartDate("");
+        setEndDate("");
+        setIsCustomProject(false);
+        
+        if (onAssignmentSuccess) {
+          onAssignmentSuccess();
+        }
+        
+        onOpenChange(false);
+      } catch (error) {
+        // Error is handled in the hook
       }
-      
-      onOpenChange(false);
     }
   };
 

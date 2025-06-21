@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,7 +12,7 @@ import { Search, UserPlus, Edit, Trash2 } from "lucide-react";
 import { useInternsData } from "@/hooks/useInternsData";
 
 const Internships = () => {
-  const { interns, loading, addIntern, deleteIntern, refetch } = useInternsData();
+  const { interns, loading, addIntern, updateIntern, deleteIntern, refetch } = useInternsData();
   const [formData, setFormData] = useState({
     photo: "",
     lastName: "",
@@ -58,6 +57,10 @@ const Internships = () => {
   };
 
   const handleAddIntern = async () => {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.school) {
+      return;
+    }
+
     try {
       await addIntern({
         firstName: formData.firstName,
@@ -66,7 +69,9 @@ const Internships = () => {
         email: formData.email,
         startDate: new Date().toISOString().split('T')[0],
         endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        status: formData.status
+        status: formData.status,
+        photo: formData.photo,
+        gender: formData.gender
       });
       
       setFormData({
@@ -80,7 +85,7 @@ const Internships = () => {
       });
       
       setIsDialogOpen(false);
-      refetch(); // Rafraîchir immédiatement après ajout
+      refetch();
     } catch (error) {
       // Error handling is done in the hook
     }
@@ -100,10 +105,36 @@ const Internships = () => {
     setIsEditDialogOpen(true);
   };
 
+  const handleUpdateIntern = async () => {
+    if (!editingIntern || !formData.firstName || !formData.lastName || !formData.email || !formData.school) {
+      return;
+    }
+
+    try {
+      await updateIntern(editingIntern.id, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        title: formData.school,
+        email: formData.email,
+        status: formData.status,
+        photo: formData.photo,
+        gender: formData.gender,
+        startDate: editingIntern.startDate,
+        endDate: editingIntern.endDate
+      });
+      
+      setIsEditDialogOpen(false);
+      setEditingIntern(null);
+      refetch();
+    } catch (error) {
+      // Error handling is done in the hook
+    }
+  };
+
   const handleDeleteIntern = async (internId: string) => {
     try {
       await deleteIntern(internId);
-      refetch(); // Rafraîchir immédiatement après suppression
+      refetch();
     } catch (error) {
       // Error handling is done in the hook
     }
@@ -150,6 +181,7 @@ const Internships = () => {
             onChange={handleInputChange}
             className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200"
             placeholder="Entrez le nom"
+            required
           />
         </div>
         <div className="space-y-3">
@@ -161,6 +193,7 @@ const Internships = () => {
             onChange={handleInputChange}
             className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200"
             placeholder="Entrez le prénom"
+            required
           />
         </div>
       </div>
@@ -175,6 +208,7 @@ const Internships = () => {
           onChange={handleInputChange}
           className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200"
           placeholder="exemple@email.com"
+          required
         />
       </div>
 
@@ -196,7 +230,7 @@ const Internships = () => {
         </div>
         
         <div className="space-y-3">
-          <Label htmlFor="school" className="text-sm font-semibold text-gray-800">École</Label>
+          <Label htmlFor="school" className="text-sm font-semibold text-gray-800">École *</Label>
           <Input 
             id="school" 
             name="school" 
@@ -204,24 +238,9 @@ const Internships = () => {
             onChange={handleInputChange}
             className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200"
             placeholder="Nom de l'école"
+            required
           />
         </div>
-      </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="status" className="text-sm font-semibold text-gray-800">Statut</Label>
-        <Select 
-          value={formData.status} 
-          onValueChange={(value) => handleSelectChange("status", value)}
-        >
-          <SelectTrigger className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-lg">
-            <SelectValue placeholder="Sélectionnez un statut" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="En cours">En cours</SelectItem>
-            <SelectItem value="Terminé">Terminé</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );
@@ -361,6 +380,7 @@ const Internships = () => {
                   <Button 
                     onClick={handleAddIntern}
                     className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                    disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.school}
                   >
                     Enregistrer
                   </Button>
@@ -370,7 +390,6 @@ const Internships = () => {
           </div>
         </div>
 
-        {/* Edit Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -382,8 +401,9 @@ const Internships = () => {
                 Annuler
               </Button>
               <Button 
-                onClick={() => setIsEditDialogOpen(false)}
+                onClick={handleUpdateIntern}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.school}
               >
                 Sauvegarder
               </Button>
@@ -392,15 +412,12 @@ const Internships = () => {
         </Dialog>
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6 bg-blue-50 p-1 rounded-xl">
+          <TabsList className="grid w-full grid-cols-2 mb-6 bg-blue-50 p-1 rounded-xl">
             <TabsTrigger value="all" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
               Tous ({filteredInterns.length})
             </TabsTrigger>
             <TabsTrigger value="ongoing" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
               En cours ({filteredInterns.filter(intern => intern.status === 'En cours').length})
-            </TabsTrigger>
-            <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-lg font-medium">
-              Terminés ({filteredInterns.filter(intern => intern.status === 'Terminé').length})
             </TabsTrigger>
           </TabsList>
           
@@ -418,18 +435,6 @@ const Internships = () => {
           
           <TabsContent value="ongoing" className="space-y-6">
             {filteredInterns.filter(intern => intern.status === 'En cours').map(renderInternCard)}
-          </TabsContent>
-          
-          <TabsContent value="completed">
-            {filteredInterns.filter(intern => intern.status === 'Terminé').length > 0 ? (
-              <div className="grid gap-6">
-                {filteredInterns.filter(intern => intern.status === 'Terminé').map(renderInternCard)}
-              </div>
-            ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <p className="text-gray-500 text-lg">Aucun stage terminé pour le moment</p>
-              </div>
-            )}
           </TabsContent>
         </Tabs>
       </div>

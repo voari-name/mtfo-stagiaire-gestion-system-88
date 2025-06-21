@@ -119,6 +119,63 @@ export const useProjectsData = () => {
     }
   };
 
+  const assignInternToProject = async (projectTitle: string, internId: string, startDate: string, endDate: string) => {
+    try {
+      // D'abord créer le projet s'il n'existe pas
+      let { data: existingProject, error: findError } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('title', projectTitle)
+        .single();
+
+      let projectId = existingProject?.id;
+
+      if (!projectId) {
+        const { data: newProject, error: createError } = await supabase
+          .from('projects')
+          .insert([{
+            title: projectTitle,
+            start_date: startDate,
+            end_date: endDate,
+            description: `Projet assigné à un stagiaire`
+          }])
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        projectId = newProject.id;
+      }
+
+      // Ensuite assigner le stagiaire au projet
+      const { error: assignError } = await supabase
+        .from('project_interns')
+        .insert([{
+          project_id: projectId,
+          intern_id: internId
+        }]);
+
+      if (assignError) throw assignError;
+
+      // Rafraîchir les données
+      await fetchProjects();
+      
+      toast({
+        title: "Assignment réussi",
+        description: `Le stagiaire a été assigné au projet "${projectTitle}".`,
+      });
+
+      return projectId;
+    } catch (error) {
+      console.error('Error assigning intern to project:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'assigner le stagiaire au projet.",
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -127,6 +184,7 @@ export const useProjectsData = () => {
     projects,
     loading,
     addProject,
+    assignInternToProject,
     refetch: fetchProjects
   };
 };

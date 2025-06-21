@@ -13,6 +13,8 @@ export interface InternData {
   endDate: string;
   status: string;
   completion?: number;
+  photo?: string;
+  gender?: string;
 }
 
 export const useInternsData = () => {
@@ -38,7 +40,9 @@ export const useInternsData = () => {
         startDate: intern.start_date,
         endDate: intern.end_date,
         status: intern.status,
-        completion: intern.completion || 0
+        completion: intern.completion || 0,
+        photo: intern.photo,
+        gender: intern.gender
       })) || [];
 
       setInterns(formattedInterns);
@@ -66,7 +70,9 @@ export const useInternsData = () => {
           start_date: internData.startDate,
           end_date: internData.endDate,
           status: internData.status,
-          completion: internData.completion || 0
+          completion: internData.completion || 0,
+          photo: internData.photo,
+          gender: internData.gender
         }])
         .select()
         .single();
@@ -82,7 +88,9 @@ export const useInternsData = () => {
         startDate: data.start_date,
         endDate: data.end_date,
         status: data.status,
-        completion: data.completion || 0
+        completion: data.completion || 0,
+        photo: data.photo,
+        gender: data.gender
       };
 
       setInterns(prev => [newIntern, ...prev]);
@@ -98,6 +106,61 @@ export const useInternsData = () => {
       toast({
         title: "Erreur",
         description: "Impossible d'ajouter le stagiaire.",
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+
+  const updateIntern = async (internId: string, internData: Partial<InternData>) => {
+    try {
+      const { data, error } = await supabase
+        .from('interns')
+        .update({
+          first_name: internData.firstName,
+          last_name: internData.lastName,
+          title: internData.title,
+          email: internData.email,
+          start_date: internData.startDate,
+          end_date: internData.endDate,
+          status: internData.status,
+          completion: internData.completion,
+          photo: internData.photo,
+          gender: internData.gender
+        })
+        .eq('id', internId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setInterns(prev => prev.map(intern => 
+        intern.id === internId ? {
+          id: data.id,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          title: data.title,
+          email: data.email,
+          startDate: data.start_date,
+          endDate: data.end_date,
+          status: data.status,
+          completion: data.completion || 0,
+          photo: data.photo,
+          gender: data.gender
+        } : intern
+      ));
+      
+      toast({
+        title: "Stagiaire modifié",
+        description: `${internData.firstName} ${internData.lastName} a été modifié avec succès.`,
+      });
+
+      return data;
+    } catch (error) {
+      console.error('Error updating intern:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier le stagiaire.",
         variant: "destructive"
       });
       throw error;
@@ -138,6 +201,7 @@ export const useInternsData = () => {
     interns,
     loading,
     addIntern,
+    updateIntern,
     deleteIntern,
     refetch: fetchInterns
   };
