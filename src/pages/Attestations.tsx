@@ -3,6 +3,7 @@ import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import EvaluationCard from "@/components/evaluations/EvaluationCard";
 import { useEvaluations } from "@/hooks/useEvaluations";
+import { EditEvaluationDialog } from "@/components/evaluations/EditEvaluationDialog";
 
 const Attestations = () => {
   const {
@@ -55,6 +56,14 @@ const Attestations = () => {
             </div>
           )}
         </div>
+
+        <EditEvaluationDialog
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          evaluation={currentEvaluation}
+          onSave={handleSaveEvaluation}
+          onInputChange={handleInputChange}
+        />
       </div>
     </MainLayout>
   );
