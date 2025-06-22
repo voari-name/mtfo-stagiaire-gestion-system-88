@@ -17,7 +17,7 @@ const Internships = () => {
     email: "",
     gender: "",
     school: "",
-    status: "En cours"
+    status: ""
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -54,7 +54,7 @@ const Internships = () => {
   };
 
   const handleAddIntern = async () => {
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.school) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.school || !formData.status) {
       return;
     }
 
@@ -78,7 +78,7 @@ const Internships = () => {
         email: "",
         gender: "",
         school: "",
-        status: "En cours"
+        status: ""
       });
       
       setIsDialogOpen(false);
@@ -103,7 +103,7 @@ const Internships = () => {
   };
 
   const handleUpdateIntern = async () => {
-    if (!editingIntern || !formData.firstName || !formData.lastName || !formData.email || !formData.school) {
+    if (!editingIntern || !formData.firstName || !formData.lastName || !formData.email || !formData.school || !formData.status) {
       return;
     }
 
@@ -143,7 +143,7 @@ const Internships = () => {
     intern.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const isFormValid = !!(formData.firstName && formData.lastName && formData.email && formData.school);
+  const isFormValid = !!(formData.firstName && formData.lastName && formData.email && formData.school && formData.status);
 
   if (loading) {
     return (

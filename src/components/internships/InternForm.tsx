@@ -121,7 +121,7 @@ export const InternForm = ({ formData, onInputChange, onSelectChange, onPhotoCha
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <div className="space-y-3">
             <Label htmlFor="gender" className="text-sm font-semibold text-gray-800">Sexe</Label>
             <Select 
@@ -154,6 +154,28 @@ export const InternForm = ({ formData, onInputChange, onSelectChange, onPhotoCha
               placeholder="Nom de l'école"
               required
             />
+          </div>
+
+          <div className="space-y-3">
+            <Label htmlFor="status" className="text-sm font-semibold text-gray-800 flex items-center">
+              <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Statut <span className="text-red-500 ml-1">*</span>
+            </Label>
+            <Select 
+              value={formData.status} 
+              onValueChange={(value) => onSelectChange("status", value)}
+            >
+              <SelectTrigger className="border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg px-4 py-3">
+                <SelectValue placeholder="Sélectionnez le statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="En cours">En cours</SelectItem>
+                <SelectItem value="Terminé">Terminé</SelectItem>
+                <SelectItem value="Suspendu">Suspendu</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
