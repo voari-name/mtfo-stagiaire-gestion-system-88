@@ -1,86 +1,60 @@
 
 import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
-import AttestationsHeader from "@/components/attestations/AttestationsHeader";
-import AttestationCard from "@/components/attestations/AttestationCard";
-import EmptyAttestationsState from "@/components/attestations/EmptyAttestationsState";
-import { CreateEvaluationDialog } from "@/components/evaluations/CreateEvaluationDialog";
-import { useInternsData } from "@/hooks/useInternsData";
-import { useProjectsData } from "@/hooks/useProjectsData";
+import EvaluationCard from "@/components/evaluations/EvaluationCard";
 import { useEvaluations } from "@/hooks/useEvaluations";
 
 const Attestations = () => {
-  const { interns, loading: internsLoading } = useInternsData();
-  const { projects, loading: projectsLoading } = useProjectsData();
-  const { evaluations, addEvaluation } = useEvaluations();
-
-  const loading = internsLoading || projectsLoading;
-
-  // Filtrer les stagiaires qui ont terminé leur stage et ont une évaluation
-  const eligibleInterns = interns.filter(intern => 
-    intern.status === 'terminé' && intern.completion >= 80
-  );
-
-  // Calculer les statistiques nécessaires
-  const activeInternsCount = interns.filter(intern => intern.status === 'en cours').length;
-  const evaluationsCount = eligibleInterns.length;
-
-  // Créer des données fictives d'évaluation pour la démonstration
-  const internsWithEvaluations = eligibleInterns.map(intern => {
-    // Trouver le projet associé au stagiaire
-    const project = projects.find(p => 
-      p.interns.some(i => i.name === `${intern.firstName} ${intern.lastName}`)
-    );
-
-    return {
-      intern: {
-        id: intern.id,
-        firstName: intern.firstName,
-        lastName: intern.lastName,
-        email: intern.email
-      },
-      project: project ? { title: project.title } : undefined,
-      evaluation: {
-        grade: Math.floor(Math.random() * 6) + 15 // Note entre 15 et 20
-      }
-    };
-  });
-
-  if (loading) {
-    return (
-      <MainLayout title="Évaluations" currentPage="evaluations">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg">Chargement des données...</div>
-        </div>
-      </MainLayout>
-    );
-  }
+  const {
+    evaluations,
+    currentEvaluation,
+    isEditDialogOpen,
+    setIsEditDialogOpen,
+    handleEditEvaluation,
+    handleSaveEvaluation,
+    handleDeleteEvaluation,
+    handleGeneratePdf,
+    handleInputChange
+  } = useEvaluations();
 
   return (
-    <MainLayout title="Évaluations" currentPage="evaluations">
-      <div className="space-y-6">
+    <MainLayout title="Attestations" currentPage="evaluations">
+      <div className="space-y-6 animate-fade-in">
         <div className="flex justify-between items-center">
-          <AttestationsHeader eligibleInternsCount={eligibleInterns.length} />
-          <CreateEvaluationDialog onEvaluationCreated={addEvaluation} />
-        </div>
-        
-        {internsWithEvaluations.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {internsWithEvaluations.map((data, index) => (
-              <AttestationCard 
-                key={data.intern.id || index}
-                intern={data.intern}
-                project={data.project}
-                evaluation={data.evaluation}
-              />
-            ))}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">Attestations</h2>
+            <p className="text-gray-600 mt-2">Liste des évaluations de stage et attestations</p>
           </div>
-        ) : (
-          <EmptyAttestationsState 
-            activeInternsCount={activeInternsCount}
-            evaluationsCount={evaluationsCount}
-          />
-        )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          {evaluations.map((evaluation, index) => (
+            <div key={evaluation.id} className="animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
+              <EvaluationCard
+                evaluation={evaluation}
+                onEdit={handleEditEvaluation}
+                onDelete={handleDeleteEvaluation}
+                onGeneratePdf={handleGeneratePdf}
+              />
+            </div>
+          ))}
+
+          {evaluations.length === 0 && (
+            <div className="text-center py-12">
+              <div className="max-w-md mx-auto">
+                <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucune attestation disponible</h3>
+                <p className="text-gray-500">
+                  Les attestations apparaîtront ici une fois que vous aurez créé des évaluations de stage.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </MainLayout>
   );

@@ -10,9 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { generateAttestationPDF } from "@/utils/attestationPdfGenerator";
 import { useInternsData } from "@/hooks/useInternsData";
+import { useEvaluations } from "@/hooks/useEvaluations";
 
 const StageEvaluation = () => {
   const { interns } = useInternsData();
+  const { addEvaluation } = useEvaluations();
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -47,6 +49,19 @@ const StageEvaluation = () => {
     const selectedIntern = interns.find(intern => intern.id === formData.internId);
     if (!selectedIntern) return;
 
+    // Ajouter l'évaluation à la liste
+    const newEvaluation = {
+      id: Date.now(),
+      firstName: selectedIntern.firstName,
+      lastName: selectedIntern.lastName,
+      startDate: selectedIntern.startDate,
+      endDate: selectedIntern.endDate,
+      grade: parseInt(formData.globalGrade),
+      comment: formData.comment || "Aucun commentaire"
+    };
+
+    addEvaluation(newEvaluation);
+
     // Generate PDF attestation
     const attestationData = {
       firstName: selectedIntern.firstName,
@@ -69,10 +84,23 @@ const StageEvaluation = () => {
 
     toast({
       title: "Évaluation enregistrée",
-      description: "L'attestation PDF a été générée avec succès",
+      description: "L'évaluation a été ajoutée et l'attestation PDF a été générée",
     });
 
     // Reset form
+    setFormData({
+      internId: "",
+      tutorName: "",
+      presence: "",
+      technicalSkills: "",
+      behavior: "",
+      globalGrade: "",
+      comment: "",
+      school: ""
+    });
+  };
+
+  const handleCancel = () => {
     setFormData({
       internId: "",
       tutorName: "",
@@ -225,24 +253,15 @@ const StageEvaluation = () => {
             <div className="flex justify-end space-x-4">
               <Button
                 variant="outline"
-                onClick={() => setFormData({
-                  internId: "",
-                  tutorName: "",
-                  presence: "",
-                  technicalSkills: "",
-                  behavior: "",
-                  globalGrade: "",
-                  comment: "",
-                  school: ""
-                })}
+                onClick={handleCancel}
               >
-                Réinitialiser
+                Annuler
               </Button>
               <Button
                 onClick={handleSubmit}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                Générer l'Attestation PDF
+                Enregistrer
               </Button>
             </div>
           </CardContent>
