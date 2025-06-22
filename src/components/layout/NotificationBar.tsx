@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
@@ -13,22 +13,28 @@ interface Notification {
 }
 
 export const NotificationBar = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      title: "Nouveau stagiaire",
-      message: "Jean Rakoto a été ajouté",
-      time: "Il y a 5 minutes",
-      read: false
-    },
-    {
-      id: 2,
-      title: "Évaluation créée",
-      message: "Évaluation de Marie Razafy créée",
-      time: "Il y a 1 heure",
-      read: false
-    }
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  // Écouter les événements personnalisés pour les notifications
+  useEffect(() => {
+    const handleNotification = (event: CustomEvent) => {
+      const newNotification: Notification = {
+        id: Date.now(),
+        title: event.detail.title,
+        message: event.detail.message,
+        time: "À l'instant",
+        read: false
+      };
+      
+      setNotifications(prev => [newNotification, ...prev.slice(0, 9)]); // Garder max 10 notifications
+    };
+
+    window.addEventListener('project-notification', handleNotification as EventListener);
+    
+    return () => {
+      window.removeEventListener('project-notification', handleNotification as EventListener);
+    };
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -36,6 +42,10 @@ export const NotificationBar = () => {
     setNotifications(notifications.map(n => 
       n.id === id ? { ...n, read: true } : n
     ));
+  };
+
+  const clearAllNotifications = () => {
+    setNotifications([]);
   };
 
   return (
@@ -55,11 +65,23 @@ export const NotificationBar = () => {
       </PopoverTrigger>
       <PopoverContent className="w-80 animate-fade-in">
         <div className="space-y-4">
-          <h4 className="font-medium leading-none">Notifications</h4>
+          <div className="flex justify-between items-center">
+            <h4 className="font-medium leading-none">Notifications</h4>
+            {notifications.length > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={clearAllNotifications}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Tout effacer
+              </Button>
+            )}
+          </div>
           {notifications.length === 0 ? (
             <p className="text-sm text-muted-foreground">Aucune notification</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-80 overflow-y-auto">
               {notifications.map((notification) => (
                 <div
                   key={notification.id}

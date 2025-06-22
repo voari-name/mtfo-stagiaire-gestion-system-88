@@ -27,6 +27,14 @@ export const useProjectsData = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // Fonction utilitaire pour envoyer des notifications
+  const sendNotification = (title: string, message: string) => {
+    const event = new CustomEvent('project-notification', {
+      detail: { title, message }
+    });
+    window.dispatchEvent(event);
+  };
+
   const fetchProjects = async () => {
     try {
       // Récupérer les projets avec leurs tâches et stagiaires associés
@@ -102,6 +110,9 @@ export const useProjectsData = () => {
 
       setProjects(prev => [newProject, ...prev]);
       
+      // Envoyer notification
+      sendNotification("Projet créé", `Le projet "${projectData.title}" a été créé avec succès`);
+      
       toast({
         title: "Projet créé",
         description: `Le projet "${projectData.title}" a été créé avec succès.`,
@@ -158,6 +169,9 @@ export const useProjectsData = () => {
 
       // Rafraîchir les données
       await fetchProjects();
+      
+      // Envoyer notification
+      sendNotification("Assignment réussi", `Stagiaire assigné au projet "${projectTitle}"`);
       
       toast({
         title: "Assignment réussi",
